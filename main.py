@@ -26,12 +26,25 @@ def main():
             ma = input("Mã KH: ")
             ten = input("Tên KH: ")
             sdt = nhap_sdt()
-            email = input("Email: ")
-            loai = input("Loại (Loyal/Casual): ").strip().capitalize()
-            if loai == 'Loyal':
-                kh = LoyalCustomer(ma, ten, sdt, email)
-            else:
-                kh = CasualCustomer(ma, ten, sdt, email)
+            while True:
+               email = input("Email: ").strip()
+               # Regex kiểm tra email
+               if re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+                   break
+               else:
+                   print("\033[91mEmail không đúng định dạng. Vui lòng nhập lại.\033[0m")
+            while True:
+               loai = input("Loại (Loyal/Casual): ").strip().capitalize()
+               if loai in ['Loyal', 'Casual']:
+                  break
+               else:
+                  print("\033[91mLoại khách hàng không hợp lệ. Vui lòng nhập lại (Loyal hoặc Casual).\033[0m")
+
+             if loai == 'Loyal':
+                  kh = LoyalCustomer(ma, ten, sdt, email)
+             else:
+                  kh = CasualCustomer(ma, ten, sdt, email)
+
             loading()
             ql.them_khach_hang(kh)
 
