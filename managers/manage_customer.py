@@ -1,10 +1,10 @@
 import csv
 import os
 import shutil
+import datetime
 import matplotlib.pyplot as plt
 from models.customer import LoyalCustomer, CasualCustomer
 from utils.logger import ghi_log
-
 class ManageCustomer:
     def __init__(self, filename='khachhang.csv'):
         self.danh_sach_khach_hang = []
@@ -14,20 +14,27 @@ class ManageCustomer:
     def doc_file(self):
         if not os.path.exists(self.filename):
             return
-        with open(self.filename, 'r', newline='', encoding='utf-8') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                if row['Loai'] == 'Loyal':
-                    kh = LoyalCustomer(row['MaKH'], row['TenKH'], row['SDT'], row['Email'])
-                else:
-                    so_lan_mua = int(row['SoLanMua']) if row['SoLanMua'] else 0
-                    tong_gia_tri = float(row['TongGiaTri']) if row['TongGiaTri'] else 0
-                    kh = CasualCustomer(row['MaKH'], row['TenKH'], row['SDT'], row['Email'], so_lan_mua, tong_gia_tri)
-                self.danh_sach_khach_hang.append(kh)
+        try:
+            with open(self.filename, 'r', newline='', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if row['Loai'] == 'Loyal':
+                       kh = LoyalCustomer(row['MaKH'], row['TenKH'], row['SDT'], row['Email'])
+                    else:
+                       so_lan_mua = int(row['SoLanMua']) if row['SoLanMua'] else 0
+                       tong_gia_tri = float(row['TongGiaTri']) if row['TongGiaTri'] else 0
+                       kh = CasualCustomer(row['MaKH'], row['TenKH'], row['SDT'], row['Email'], so_lan_mua, tong_gia_tri)
+                    self.danh_sach_khach_hang.append(kh)
+        except Exception as e:
+              print(f"\033[91mLỗi đọc file: {e}\033[0m")         
+
 
     def backup_file(self):
         if os.path.exists(self.filename):
-            shutil.copy(self.filename, f"backup_{self.filename}")
+           timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+           backup_filename = f"backup_{timestamp}_{self.filename}"
+           shutil.copy(self.filename, backup_filename)
+
 
     def ghi_file(self):
         self.backup_file()
@@ -72,13 +79,22 @@ class ManageCustomer:
 
 
     def them_khach_hang(self, khach_hang):
-        if self.tim_kiem(ma_kh=khach_hang.ma_khach_hang):
-            print("\033[91mMã khách hàng đã tồn tại!\033[0m")
-            return
+        for kh in self.danh_sach_khach_hang:
+            if kh.ma_khach_hang == khach_hang.ma_khach_hang:
+               print("\033[91mMã khách hàng đã tồn tại!\033[0m")
+               return
+            if kh.so_dien_thoai == khach_hang.so_dien_thoai:
+               print("\033[91mSố điện thoại đã tồn tại!\033[0m")
+               return
+            if kh.email == khach_hang.email:
+               print("\033[91mEmail đã tồn tại!\033[0m")
+               return
+
         self.danh_sach_khach_hang.append(khach_hang)
         self.ghi_file()
         ghi_log("Thêm", khach_hang)
         print("\033[92m✔ Thêm khách hàng thành công.\033[0m")
+
 
     def sua_thong_tin(self, ma_khach_hang, ten_moi, email_moi):
         kh = next((k for k in self.danh_sach_khach_hang if k.ma_khach_hang == ma_khach_hang), None)
@@ -106,13 +122,19 @@ class ManageCustomer:
     def cap_nhat_mua_hang(self, ma_khach_hang, so_lan_mua, gia_tri):
         kh = next((k for k in self.danh_sach_khach_hang if k.ma_khach_hang == ma_khach_hang), None)
         if isinstance(kh, CasualCustomer):
+            if so_lan_mua < 0 or gia_tri < 0:
+                print("\033[91mGiá trị mua hàng không hợp lệ.\033[0m")
+                return
+
             kh.so_lan_mua_hang += so_lan_mua
             kh.tong_gia_tri_mua_hang += gia_tri
+
             if kh.tong_gia_tri_mua_hang > 2000000:
                 self.danh_sach_khach_hang.remove(kh)
                 kh_moi = LoyalCustomer(kh.ma_khach_hang, kh.ten_khach_hang, kh.so_dien_thoai, kh.email)
                 self.danh_sach_khach_hang.append(kh_moi)
                 print("\033[94mKhách hàng đã trở thành khách thân thiết!\033[0m")
+
             self.ghi_file()
             ghi_log('Cập nhật mua hàng', kh)
             print("\033[92m✔ Cập nhật mua hàng thành công.\033[0m")
@@ -128,6 +150,7 @@ class ManageCustomer:
         print("-" * len(header))
         for kh in self.danh_sach_khach_hang:
             self.in_thong_tin(kh)
+    
 
     def in_thong_tin(self, kh):
         if isinstance(kh, CasualCustomer):
