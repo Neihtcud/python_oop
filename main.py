@@ -1,6 +1,7 @@
 from managers.manage_customer import ManageCustomer
 from models.customer import LoyalCustomer, CasualCustomer
-from utils.helpers import clear_screen, loading, nhap_sdt
+from utils.helpers import clear_screen, loading, nhap_sdt, nhap_ten
+import re
 
 def main():
     ql = ManageCustomer()
@@ -24,26 +25,27 @@ def main():
 
         if choice == '1':
             ma = input("Mã KH: ")
-            ten = input("Tên KH: ")
+            ten = nhap_ten()
             sdt = nhap_sdt()
             while True:
-               email = input("Email: ").strip()
-               # Regex kiểm tra email
-               if re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+                email = input("Email: ").strip()
+                # Regex kiểm tra email
+                if re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
                    break
-               else:
-                   print("\033[91mEmail không đúng định dạng. Vui lòng nhập lại.\033[0m")
+                else:
+                    print("\033[91mEmail không đúng định dạng. Vui lòng nhập lại.\033[0m")
+            
             while True:
-               loai = input("Loại (Loyal/Casual): ").strip().capitalize()
-               if loai in ['Loyal', 'Casual']:
-                  break
-               else:
-                  print("\033[91mLoại khách hàng không hợp lệ. Vui lòng nhập lại (Loyal hoặc Casual).\033[0m")
+                loai = input("Loại (Loyal/Casual): ").strip().capitalize()
+                if loai in ['Loyal', 'Casual']:
+                    break
+                else:
+                    print("\033[91mLoại khách hàng không hợp lệ. Vui lòng nhập lại (Loyal hoặc Casual).\033[0m")
 
-             if loai == 'Loyal':
-                  kh = LoyalCustomer(ma, ten, sdt, email)
-             else:
-                  kh = CasualCustomer(ma, ten, sdt, email)
+            if loai == 'Loyal':
+                kh = LoyalCustomer(ma, ten, sdt, email)
+            else:
+                kh = CasualCustomer(ma, ten, sdt, email)
 
             loading()
             ql.them_khach_hang(kh)
@@ -51,7 +53,13 @@ def main():
         elif choice == '2':
             ma = input("Nhập mã KH cần sửa: ")
             ten_moi = input("Tên mới: ")
-            email_moi = input("Email mới: ")
+            while True:
+                email_moi = input("Email mới: ").strip()
+                if re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email_moi):
+                   break
+                else:
+                   print("\033[91mEmail không đúng định dạng. Vui lòng nhập lại.\033[0m")
+
             loading()
             ql.sua_thong_tin(ma, ten_moi, email_moi)
 
@@ -61,6 +69,12 @@ def main():
             ql.xoa_khach_hang(ma)
 
         elif choice == '4':
+            so_lan_raw = input("Số lần mua: ")
+            gia_tri_raw = input("Tổng giá trị đơn hàng: ")
+
+            if not so_lan_raw.isdigit() or not re.match(r'^\d+(\.\d+)?$', gia_tri_raw):
+               print("\033[91mSố lần mua hoặc giá trị đơn hàng không hợp lệ.\033[0m")
+               continue
             ma = input("Nhập mã KH: ")
             so_lan = int(input("Số lần mua: "))
             gia_tri = float(input("Tổng giá trị đơn hàng: "))
