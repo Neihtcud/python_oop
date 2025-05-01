@@ -1,6 +1,6 @@
 from managers.manage_customer import ManageCustomer
 from models.customer import LoyalCustomer, CasualCustomer
-from utils.helpers import clear_screen, loading, nhap_sdt, nhap_ten
+from utils.helpers import clear_screen, loading, nhap_sdt, nhap_ten, kiem_tra_email, nhap_email
 import re
 
 def main():
@@ -27,14 +27,7 @@ def main():
             ma = input("Mã KH: ")
             ten = nhap_ten()
             sdt = nhap_sdt()
-            while True:
-                email = input("Email: ").strip()
-                # Regex kiểm tra email
-                if re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
-                   break
-                else:
-                    print("\033[91mEmail không đúng định dạng. Vui lòng nhập lại.\033[0m")
-            
+            email = nhap_email()
             while True:
                 loai = input("Loại (Loyal/Casual): ").strip().capitalize()
                 if loai in ['Loyal', 'Casual']:
@@ -52,16 +45,25 @@ def main():
 
         elif choice == '2':
             ma = input("Nhập mã KH cần sửa: ")
-            ten_moi = input("Tên mới: ")
-            while True:
-                email_moi = input("Email mới: ").strip()
-                if re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email_moi):
-                   break
+            kh = ql.tim_kiem(ma_kh=ma)
+            if not kh:
+                print("\033[91mKhông tìm thấy khách hàng.\033[0m")
+            else: 
+                kh = kh[0]
+                print(f"\nHiện tại: Tên: {kh.ten_khach_hang}, Email: {kh.email}, SĐT: {kh.so_dien_thoai}")
+                if input("Bạn có muốn sửa tên không? (y/n): ").strip().lower() == 'y':
+                    ten_moi = nhap_ten()
                 else:
-                   print("\033[91mEmail không đúng định dạng. Vui lòng nhập lại.\033[0m")
-
-            loading()
-            ql.sua_thong_tin(ma, ten_moi, email_moi)
+                    ten_moi = kh.ten_khach_hang 
+                if input("Bạn có muốn sửa email không? (y/n): ").strip().lower() == 'y':
+                    email_moi = nhap_email()
+                else:
+                    email_moi = kh.email       
+                if input("Bạn có muốn sửa số điện thoại không? (y/n): ").strip().lower() == 'y':
+                    sdt_moi = nhap_sdt()                
+                else:
+                    sdt_moi = kh.so_dien_thoai    
+                ql.sua_thong_tin(ma, ten_moi,  email_moi , sdt_moi)
 
         elif choice == '3':
             ma = input("Nhập mã KH cần xóa: ")

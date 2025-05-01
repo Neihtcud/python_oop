@@ -10,6 +10,16 @@ def nhap_sdt():
         if sdt.isdigit() and len(sdt) == 10:
             return sdt
         print("\033[91mSố điện thoại không hợp lệ. Vui lòng nhập lại.\033[0m")
+def kiem_tra_email(email):
+    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    return re.match(pattern, email) is not None
+
+def nhap_email():
+    while True:
+        email = input("Email: ").strip()
+        if kiem_tra_email(email):
+            return email
+        print("\033[91mEmail không hợp lệ. Vui lòng nhập lại.\033[0m")
 
 def nhap_ten():
     while True:

@@ -68,7 +68,7 @@ class ManageCustomer:
             if ten_chua and ten_chua.lower() not in kh.ten_khach_hang.lower():
                 continue
             if isinstance(kh, CasualCustomer):
-                if tong_gia_min and kh.tong_gia_tri_mua_hang < tong_gia_min:
+                if tong_gia_min is not None and kh.tong_gia_tri_mua_hang < tong_gia_min:
                     continue
                 if tong_gia_max and kh.tong_gia_tri_mua_hang > tong_gia_max:
                    continue
@@ -96,11 +96,12 @@ class ManageCustomer:
         print("\033[92m✔ Thêm khách hàng thành công.\033[0m")
 
 
-    def sua_thong_tin(self, ma_khach_hang, ten_moi, email_moi):
+    def sua_thong_tin(self, ma_khach_hang, ten_moi=None, email_moi=None, sdt_moi=None):
         kh = next((k for k in self.danh_sach_khach_hang if k.ma_khach_hang == ma_khach_hang), None)
         if kh:
-            kh.ten_khach_hang = ten_moi
-            kh.email = email_moi
+            if ten_moi:   kh.ten_khach_hang = ten_moi
+            if email_moi: kh.email = email_moi
+            if sdt_moi: kh.so_dien_thoai = sdt_moi
             self.ghi_file()
             ghi_log('Sửa', kh)
             print("\033[92m✔ Cập nhật thành công.\033[0m")
@@ -122,6 +123,10 @@ class ManageCustomer:
     def cap_nhat_mua_hang(self, ma_khach_hang, so_lan_mua, gia_tri):
         kh = next((k for k in self.danh_sach_khach_hang if k.ma_khach_hang == ma_khach_hang), None)
         if isinstance(kh, CasualCustomer):
+            if kh is None:
+               print("\033[91mKhông tìm thấy khách hàng.\033[0m")
+               return
+
             if so_lan_mua < 0 or gia_tri < 0:
                 print("\033[91mGiá trị mua hàng không hợp lệ.\033[0m")
                 return
