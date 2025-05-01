@@ -50,16 +50,6 @@ class ManageCustomer:
                     writer.writerow({'Loai': 'Casual', 'MaKH': kh.ma_khach_hang, 'TenKH': kh.ten_khach_hang,
                                      'SDT': kh.so_dien_thoai, 'Email': kh.email,
                                      'SoLanMua': kh.so_lan_mua_hang, 'TongGiaTri': kh.tong_gia_tri_mua_hang})
-
-    def tim_kiem(self, ma_kh=None, ten=None, sdt=None, email=None):
-        ket_qua = []
-        for kh in self.danh_sach_khach_hang:
-            if (not ma_kh or ma_kh.lower() in kh.ma_khach_hang.lower()) and \
-               (not ten or ten.lower() in kh.ten_khach_hang.lower()) and \
-               (not sdt or sdt in kh.so_dien_thoai) and \
-               (not email or email.lower() in kh.email.lower()):
-                ket_qua.append(kh)
-        return ket_qua
     def tim_kiem_nang_cao(self, loai=None, ten_chua=None, tong_gia_min=None, tong_gia_max=None, so_lan_mua_min=None):
         ket_qua = []
         for kh in self.danh_sach_khach_hang:

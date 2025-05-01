@@ -14,14 +14,13 @@ def main():
         print("\033[93m║ 2. Sửa thông tin khách hàng                   ║\033[0m")
         print("\033[93m║ 3. Xóa khách hàng                             ║\033[0m")
         print("\033[93m║ 4. Cập nhật mua hàng                          ║\033[0m")
-        print("\033[93m║ 5. Tìm kiếm khách hàng                        ║\033[0m")
+        print("\033[93m║ 5. Tìm kiếm                                   ║\033[0m")
         print("\033[93m║ 6. Hiển thị danh sách (có sắp xếp)             ║\033[0m")
         print("\033[93m║ 7. Thống kê và Vẽ biểu đồ                     ║\033[0m")
         print("\033[93m║ 8. Top 3 khách hàng mua nhiều                 ║\033[0m")
-        print("\033[93m║ 9. Tìm kiếm nâng cao                          ║\033[0m")
         print("\033[91m║ 0. Thoát                                       ║\033[0m")
         print("\033[96m╚══════════════════════════════════════════════╝\033[0m")
-        choice = input("\033[95m>> Chọn chức năng (0-9): \033[0m")
+        choice = input("\033[95m>> Chọn chức năng (0-8): \033[0m")
 
         if choice == '1':
             ma = input("Mã KH: ")
@@ -82,22 +81,8 @@ def main():
             gia_tri = float(input("Tổng giá trị đơn hàng: "))
             loading()
             ql.cap_nhat_mua_hang(ma, so_lan, gia_tri)
-
-        elif choice == '5':
-            ma = input("Mã KH (bỏ qua nếu không tìm theo mã): ")
-            ten = input("Tên KH (bỏ qua nếu không tìm theo tên): ")
-            sdt = input("SĐT (bỏ qua nếu không tìm theo SĐT): ")
-            email = input("Email (bỏ qua nếu không tìm theo Email): ")
-            ket_qua = ql.tim_kiem(ma_kh=ma, ten=ten, sdt=sdt, email=email)
-            loading()
-            if ket_qua:
-              for kh in ket_qua:
-               ql.in_thong_tin(kh)
-            else:
-               print("\033[91mKhông tìm thấy khách hàng.\033[0m")
-
         elif choice == '6':
-            sort_field = input("Sắp xếp theo trường nào (ma_khach_hang/ten_khach_hang/so_dien_thoai/tong_gia_tri_mua_hang): ")
+            sort_field = input("Sắp xếp theo trường nào (ma/ten/sdt/tong): ")
             order = input("Tăng (asc) hay giảm (desc)? ").strip().lower()
             loading()
             ql.hien_thi_danh_sach(key_sort=sort_field, reverse=(order == 'desc'))
@@ -107,14 +92,14 @@ def main():
             ql.thong_ke()
 
         elif choice == '8':
-            kieu = input("Lọc theo tổng tiền hay số lần mua (gia_tri/so_lan): ").strip()
+            kieu = input("Lọc theo tổng tiền hay số lần mua (gia tri/so lan): ").strip()
             top = ql.top_khach_hang(kieu)
             if not top:
                 print("\033[91mKhông có khách hàng nào.\033[0m")
             else:    
                 for kh in top:
                     ql.in_thong_tin(kh)
-        elif choice == '9':
+        elif choice == '5':
             loai = input("Loại khách hàng (Loyal/Casual/bỏ trống nếu không): ").strip().capitalize()
             ten_chua = input("Tên chứa (bỏ trống nếu không): ")
             tong_gia_min = input("Tổng giá trị tối thiểu (bỏ trống nếu không): ")
