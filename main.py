@@ -7,44 +7,61 @@ def main():
     ql = ManageCustomer()
 
     while True:
-        print("\n\033[96m╔══════════════════════════════════════════════╗\033[0m")
+        print("\033[96m╔=═════════════════════════════════════════════=╗\033[0m")
         print("\033[96m║             QUẢN LÝ KHÁCH HÀNG                ║\033[0m")
-        print("\033[96m╠══════════════════════════════════════════════╣\033[0m")
+        print("\033[96m╠══════════════════════════════════════════════=╣\033[0m")
         print("\033[93m║ 1. Thêm khách hàng                            ║\033[0m")
         print("\033[93m║ 2. Sửa thông tin khách hàng                   ║\033[0m")
         print("\033[93m║ 3. Xóa khách hàng                             ║\033[0m")
         print("\033[93m║ 4. Cập nhật mua hàng                          ║\033[0m")
         print("\033[93m║ 5. Tìm kiếm                                   ║\033[0m")
-        print("\033[93m║ 6. Hiển thị danh sách (có sắp xếp)             ║\033[0m")
+        print("\033[93m║ 6. Hiển thị danh sách (có sắp xếp)            ║\033[0m")
         print("\033[93m║ 7. Thống kê và Vẽ biểu đồ                     ║\033[0m")
-        print("\033[93m║ 8. Top 3 khách hàng mua nhiều                 ║\033[0m")
-        print("\033[91m║ 0. Thoát                                       ║\033[0m")
-        print("\033[96m╚══════════════════════════════════════════════╝\033[0m")
-        choice = input("\033[95m>> Chọn chức năng (0-8): \033[0m")
+        print("\033[93m║ 8. Hiển thị 3 khách hàng mua hàng nhiều nhất  ║\033[0m")
+        print("\033[93m║ 9. Thống kê KH thân thiết tặng quà Tết        ║\033[0m")
+        print("\033[91m║ 0. Thoát                                      ║\033[0m")
+        print("\033[96m╚══════════════════════════════════════════════=╝\033[0m")
+        choice = input("\033[95m>> Chọn chức năng (0-9): \033[0m")
 
         if choice == '1':
-            ma = input("Mã KH: ")
-            ten = nhap_ten()
-            sdt = nhap_sdt()
-            email = nhap_email()
-            while True:
-                loai = input("Loại (Loyal/Casual): ").strip().capitalize()
-                if loai in ['Loyal', 'Casual']:
-                    break
-                else:
-                    print("\033[91mLoại khách hàng không hợp lệ. Vui lòng nhập lại (Loyal hoặc Casual).\033[0m")
+           ma = input("Mã KH: ")
+           ten = nhap_ten()
+           sdt = nhap_sdt()
+           email = nhap_email()
 
-            if loai == 'Loyal':
-                kh = LoyalCustomer(ma, ten, sdt, email)
-            else:
-                kh = CasualCustomer(ma, ten, sdt, email)
+           # Hiển thị menu chọn loại khách hàng
+           print("\nChọn loại khách hàng:")
+           print("1. Loyal (Thân thiết)")
+           print("2. Casual (Thường)")
 
-            loading()
-            ql.them_khach_hang(kh)
+           loai = None  # Khởi tạo loại trước vòng lặp
+           while True:
+              loai_choice = input(">> Nhập lựa chọn (1 hoặc 2): ").strip()
+              if loai_choice == '1':
+                 loai = 'loyal'
+                 break
+              elif loai_choice == '2':
+                 loai = 'casual'
+                 break
+              else:
+                 print("\033[91mLựa chọn không hợp lệ. Vui lòng chọn 1 hoặc 2.\033[0m")
+
+           # Tạo khách hàng tương ứng
+           if loai == 'loyal':
+              kh = LoyalCustomer(ma, ten, sdt, email)
+           elif loai == 'casual':
+              kh = CasualCustomer(ma, ten, sdt, email)
+           else:
+              print("\033[91mLỗi: Loại khách hàng không xác định.\033[0m")
+              continue  # Nếu không xác định được loại, quay lại menu chính
+
+           loading()
+           ql.them_khach_hang(kh)
 
         elif choice == '2':
             ma = input("Nhập mã KH cần sửa: ")
-            kh = ql.tim_kiem(ma_kh=ma)
+            # Sử dụng tim_kiem_nang_cao thay vì tim_kiem
+            kh = ql.tim_kiem_nang_cao(ma_kh=ma)
             if not kh:
                 print("\033[91mKhông tìm thấy khách hàng.\033[0m")
             else: 
@@ -62,7 +79,8 @@ def main():
                     sdt_moi = nhap_sdt()                
                 else:
                     sdt_moi = kh.so_dien_thoai    
-                ql.sua_thong_tin(ma, ten_moi,  email_moi , sdt_moi)
+                loading()
+                ql.sua_thong_tin(ma, ten_moi, email_moi, sdt_moi)
 
         elif choice == '3':
             ma = input("Nhập mã KH cần xóa: ")
@@ -70,62 +88,138 @@ def main():
             ql.xoa_khach_hang(ma)
 
         elif choice == '4':
-            so_lan_raw = input("Số lần mua: ")
-            gia_tri_raw = input("Tổng giá trị đơn hàng: ")
-
-            if not so_lan_raw.isdigit() or not re.match(r'^\d+(\.\d+)?$', gia_tri_raw):
-               print("\033[91mSố lần mua hoặc giá trị đơn hàng không hợp lệ.\033[0m")
-               continue
             ma = input("Nhập mã KH: ")
-            so_lan = int(input("Số lần mua: "))
-            gia_tri = float(input("Tổng giá trị đơn hàng: "))
-            loading()
-            ql.cap_nhat_mua_hang(ma, so_lan, gia_tri)
+            # Sử dụng tim_kiem_nang_cao thay vì tim_kiem
+            kh = ql.tim_kiem_nang_cao(ma_kh=ma)
+            if not kh:
+                print("\033[91mKhông tìm thấy khách hàng.\033[0m")
+                continue
+            else:
+                kh = kh[0]
+                # Kiểm tra loại khách hàng
+                if isinstance(kh, LoyalCustomer):
+                    print("\033[91mKhách hàng thân thiết không cần cập nhật mua hàng.\033[0m")
+                    continue
+                print(f"Khách hàng: {kh.ten_khach_hang} ({kh.ma_khach_hang})")
+
+            try:
+                so_lan_raw = input("Số lần mua: ")
+                gia_tri_raw = input("Tổng giá trị đơn hàng: ")
+                so_lan = int(so_lan_raw)
+                gia_tri = float(gia_tri_raw)
+                
+                loading()
+                ql.cap_nhat_mua_hang(ma, so_lan, gia_tri)
+            except ValueError:
+                print("\033[91mSố lần mua hoặc giá trị đơn hàng không hợp lệ.\033[0m")
+                continue
+
+        elif choice == '5':
+            print("🔎 Tìm kiếm :")
+            print("\nChọn loại khách hàng:")
+            print("1. Loyal (Thân thiết)")
+            print("2. Casual (Thường)")
+            print("3. Bỏ qua lọc theo loại")
+
+            loai = None  # Khởi tạo loại mặc định
+            while True:
+                loai_input = input(">> Nhập lựa chọn (1/2/3): ").strip()
+                if loai_input == '1':
+                  loai = "Loyal"
+                  break
+                elif loai_input == '2':
+                  loai = "Casual"
+                  break
+                elif loai_input == '3' or loai_input == '':
+                  loai = None
+                  break
+                else:
+                  print("\033[91mLựa chọn không hợp lệ. Vui lòng chọn 1, 2 hoặc 3.\033[0m")
+
+            ten_chua = input("Tên chứa (bỏ trống nếu không): ")
+            email_chua = input("Email chứa (bỏ trống nếu không): ")
+            ma_kh = input("Mã KH (bỏ trống nếu không): ")
+            sdt_chua = input("SĐT chứa (bỏ trống nếu không): ")
+            
+            try:
+                tong_gia_min = input("Tổng giá trị tối thiểu (bỏ trống nếu không): ")
+                tong_gia_min = float(tong_gia_min) if tong_gia_min else None
+                
+                tong_gia_max = input("Tổng giá trị tối đa (bỏ trống nếu không): ")
+                tong_gia_max = float(tong_gia_max) if tong_gia_max else None
+                
+                so_lan_mua_min = input("Số lần mua tối thiểu (bỏ trống nếu không): ")
+                so_lan_mua_min = int(so_lan_mua_min) if so_lan_mua_min else None
+                
+                loading()
+                ket_qua = ql.tim_kiem_nang_cao(
+                    loai=loai,
+                    ten_chua=ten_chua,
+                    email_chua=email_chua,
+                    ma_kh=ma_kh,
+                    sdt_chua=sdt_chua,
+                    tong_gia_min=tong_gia_min,
+                    tong_gia_max=tong_gia_max,
+                    so_lan_mua_min=so_lan_mua_min
+                )
+            except ValueError:
+                print("\033[91mGiá trị số không hợp lệ.\033[0m")
+                continue
+
+            if ket_qua:
+               print(f"\n🔍 Kết quả tìm kiếm ({len(ket_qua)} khách hàng):")
+               for kh in ket_qua:
+                   ql.in_thong_tin(kh)
+            else:
+               print("\033[91mKhông tìm thấy khách hàng.\033[0m")    
+
         elif choice == '6':
-            sort_field = input("Sắp xếp theo trường nào (ma/ten/sdt/tong): ")
+            # Thêm tùy chọn lọc theo loại
+            print("\nChọn loại khách hàng để hiển thị:")
+            print("1. Loyal (Thân thiết)")
+            print("2. Casual (Thường)")
+            print("3. Tất cả khách hàng")
+            
+            loai = None
+            loai_choice = input(">> Nhập lựa chọn (1/2/3): ").strip()
+            if loai_choice == '1':
+                loai = 'Loyal'
+            elif loai_choice == '2':
+                loai = 'Casual'
+                
+            sort_field = input("Sắp xếp theo trường nào (ma_khach_hang/ten_khach_hang/so_dien_thoai/tong_gia_tri_mua_hang): ")
             order = input("Tăng (asc) hay giảm (desc)? ").strip().lower()
             loading()
-            ql.hien_thi_danh_sach(key_sort=sort_field, reverse=(order == 'desc'))
-
+            ql.hien_thi_danh_sach(key_sort=sort_field, reverse=(order == 'desc'), loai=loai)
         elif choice == '7':
             loading()
             ql.thong_ke()
-
         elif choice == '8':
-            kieu = input("Lọc theo tổng tiền hay số lần mua (gia tri/so lan): ").strip()
-            top = ql.top_khach_hang(kieu)
-            if not top:
-                print("\033[91mKhông có khách hàng nào.\033[0m")
-            else:    
-                for kh in top:
-                    ql.in_thong_tin(kh)
-        elif choice == '5':
-            loai = input("Loại khách hàng (Loyal/Casual/bỏ trống nếu không): ").strip().capitalize()
-            ten_chua = input("Tên chứa (bỏ trống nếu không): ")
-            tong_gia_min = input("Tổng giá trị tối thiểu (bỏ trống nếu không): ")
-            tong_gia_min = float(tong_gia_min) if tong_gia_min else None
-            tong_gia_max = input("Tổng giá trị tối đa (bỏ trống nếu không): ")
-            tong_gia_max = float(tong_gia_max) if tong_gia_max else None
-            so_lan_mua_min = input("Số lần mua tối thiểu (bỏ trống nếu không): ")
-            so_lan_mua_min = int(so_lan_mua_min) if so_lan_mua_min else None
-    
-            ket_qua = ql.tim_kiem_nang_cao(loai=loai if loai else None, ten_chua=ten_chua, 
-                                   tong_gia_min=tong_gia_min, tong_gia_max=tong_gia_max,
-                                     so_lan_mua_min=so_lan_mua_min)
             loading()
-            if ket_qua:
-                 for kh in ket_qua:
-                     ql.in_thong_tin(kh)
-            else:
-                print("\033[91mKhông tìm thấy khách hàng.\033[0m")
-    
+            ql.thong_ke()
+            # Hiển thị top khách hàng
+            top_n = input("Hiển thị top bao nhiêu khách hàng? (mặc định: 3): ")
+            try:
+                top_n = int(top_n) if top_n else 3
+                ql.hien_thi_top_khach_hang(n=top_n)
+            except ValueError:
+                print("\033[91mSố lượng không hợp lệ, hiển thị mặc định top 3.\033[0m")
+                ql.hien_thi_top_khach_hang()
+        
+        elif choice == '9':
+            loading()
+            ql.thong_ke_khach_hang_than_thiet()
 
         elif choice == '0':
             print("\033[92mCảm ơn bạn đã sử dụng chương trình. Tạm biệt!\033[0m")
             break
         else:
             print("\033[91m❌ Lựa chọn không hợp lệ. Vui lòng chọn lại!\033[0m")
+        
+        # Thêm tùy chọn tiếp tục hoặc quay lại menu
+        if choice != '0':
+            input("\nNhấn Enter để tiếp tục...")
+            clear_screen()  # Làm sạch màn hình trước khi hiển thị lại menu
 
 if __name__ == '__main__':
     main()
-
