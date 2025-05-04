@@ -429,4 +429,98 @@ class TestCustomer(unittest.TestCase):
         self.assertEqual(casual.ma_khach_hang, "C001")
         self.assertEqual(casual.ten_khach_hang, "Trần Thị B")
         self.assertEqual(casual.so_lan_mua_hang, 5)
-        self.assertEqual(casual.tong_
+        self.assertEqual(casual.tong_gia_tri_mua_hang, 1500000)
+
+    def test_luu_va_doc_file(self):
+        """
+        Test case 26: Kiểm tra lưu và đọc file CSV
+        """
+        # Thêm khách hàng
+        self.manager.them_khach_hang(self.loyal_customer)
+        self.manager.them_khach_hang(self.casual_customer)
+        
+        # Lưu vào file
+        self.manager.luu_file()
+        
+        # Tạo manager mới để đọc file
+        new_manager = ManageCustomer(self.filename)
+        new_manager.doc_file()
+        
+        # Kiểm tra đã đọc đúng số lượng
+        self.assertEqual(len(new_manager.danh_sach_khach_hang), 2)
+        
+        # Kiểm tra thông tin khách hàng
+        loyal = new_manager.tim_kiem_nang_cao(ma_kh="L001")[0]
+        casual = new_manager.tim_kiem_nang_cao(ma_kh="C001")[0]
+        
+        self.assertEqual(loyal.ma_khach_hang, "L001")
+        self.assertEqual(loyal.ten_khach_hang, "Nguyễn Văn A")
+        self.assertEqual(loyal.diem_tich_luy, 500)
+        
+        self.assertEqual(casual.ma_khach_hang, "C001")
+        self.assertEqual(casual.ten_khach_hang, "Trần Thị B")
+        self.assertEqual(casual.so_lan_mua_hang, 5)
+        self.assertEqual(casual.tong_gia_tri_mua_hang, 1500000)
+
+    def test_cap_nhat_diem_tich_luy(self):
+        """
+        Test case 27: Kiểm tra cập nhật điểm tích lũy
+        """
+        # Thêm khách hàng thân thiết
+        self.manager.them_khach_hang(self.loyal_customer)
+        
+        # Cập nhật điểm tích lũy
+        self.manager.cap_nhat_diem_tich_luy("L001", 200)
+        
+        # Kiểm tra sau khi cập nhật
+        updated = self.manager.tim_kiem_nang_cao(ma_kh="L001")[0]
+        self.assertEqual(updated.diem_tich_luy, 700)  # 500 + 200
+
+    def test_giam_diem_tich_luy(self):
+        """
+        Test case 28: Kiểm tra giảm điểm tích lũy khi đổi quà
+        """
+        # Thêm khách hàng thân thiết
+        self.manager.them_khach_hang(self.loyal_customer)  # 500 điểm
+        
+        # Giảm điểm khi đổi quà
+        result = self.manager.doi_qua("L001", 300)
+        
+        # Kiểm tra kết quả
+        self.assertTrue(result)
+        
+        # Kiểm tra điểm sau khi đổi
+        updated = self.manager.tim_kiem_nang_cao(ma_kh="L001")[0]
+        self.assertEqual(updated.diem_tich_luy, 200)  # 500 - 300
+        
+    def test_doi_qua_khong_du_diem(self):
+        """
+        Test case 29: Kiểm tra trường hợp đổi quà nhưng không đủ điểm
+        """
+        # Thêm khách hàng thân thiết
+        self.manager.them_khach_hang(self.loyal_customer)  # 500 điểm
+        
+        # Thử đổi quà với điểm nhiều hơn hiện có
+        result = self.manager.doi_qua("L001", 600)
+        
+        # Kiểm tra kết quả
+        self.assertFalse(result)
+        
+        # Kiểm tra điểm không thay đổi
+        updated = self.manager.tim_kiem_nang_cao(ma_kh="L001")[0]
+        self.assertEqual(updated.diem_tich_luy, 500)  # Vẫn giữ nguyên
+
+    def test_tinh_tong_gia_tri(self):
+        """
+        Test case 30: Kiểm tra tính tổng giá trị mua hàng của tất cả khách hàng
+        """
+        # Thêm các khách hàng casual
+        self.manager.them_khach_hang(
+            CasualCustomer("C001", "A", "0912345671", "a@test.com", 1, 1000000)
+        )
+        self.manager.them_khach_hang(
+            CasualCustomer("C002", "B", "0912345672", "b@test.com", 1, 3000000)
+        )
+        
+        # Thêm khách hàng loyal (đã được nâng cấp từ casual)
+        self.manager.them_khach_hang(
