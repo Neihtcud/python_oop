@@ -524,3 +524,15 @@ class TestCustomer(unittest.TestCase):
         
         # Thêm khách hàng loyal (đã được nâng cấp từ casual)
         self.manager.them_khach_hang(
+            LoyalCustomer("L001", "C", "0912345673", "c@test.com", 250)  # tương đương 2.5tr đã mua
+        )
+        
+        # Tính tổng giá trị
+        tong_gia_tri = self.manager.tinh_tong_gia_tri_mua_hang()
+        
+        # Kiểm tra kết quả: 1tr + 3tr + 2.5tr = 6.5tr
+        self.assertEqual(tong_gia_tri, 6500000)
+        
+        # Kiểm tra trường hợp không có khách hàng
+        manager_moi = ManageCustomer(self.filename)  # manager mới chưa có dữ liệu
+        self.assertEqual(manager_moi.tinh_tong_gia_tri_mua_hang(), 0)
