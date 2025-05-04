@@ -11,7 +11,7 @@ class Customer:
 class LoyalCustomer(Customer):
     def __init__(self, ma_khach_hang, ten_khach_hang, so_dien_thoai, email, diem_tich_luy=0):
         super().__init__(ma_khach_hang, ten_khach_hang, so_dien_thoai, email)
-        self.diem_tich_luy = diem_tich_luy
+        self.diem_tich_luy = int(diem_tich_luy) if isinstance(diem_tich_luy, str) else diem_tich_luy
     
     def __str__(self):
         return f"{super().__str__()} | Điểm tích lũy: {self.diem_tich_luy}"
@@ -38,6 +38,17 @@ class LoyalCustomer(Customer):
             email=row["Email"],
             diem_tich_luy=diem_tich_luy
         )
+    
+    # Thêm phương thức để chuyển đổi từ CasualCustomer
+    @classmethod
+    def from_casual_customer(cls, casual_customer, diem_tich_luy=0):
+        return cls(
+            ma_khach_hang=casual_customer.ma_khach_hang,
+            ten_khach_hang=casual_customer.ten_khach_hang,
+            so_dien_thoai=casual_customer.so_dien_thoai,
+            email=casual_customer.email,
+            diem_tich_luy=diem_tich_luy
+        )
 
 class CasualCustomer(Customer):
     def __init__(self, ma_khach_hang, ten_khach_hang, so_dien_thoai, email, so_lan_mua_hang=0, tong_gia_tri_mua_hang=0):
@@ -51,7 +62,7 @@ class CasualCustomer(Customer):
         return self.tong_gia_tri_mua_hang / self.so_lan_mua_hang
     
     def __str__(self):
-        return f"{super().__str__()} | Số lần mua: {self.so_lan_mua_hang}, Tổng giá trị: {self.tong_gia_tri_mua_hang}"
+        return f"{super().__str__()} | Số lần mua: {self.so_lan_mua_hang}, Tổng giá trị: {self.tong_gia_tri_mua_hang:,.0f}"
     
     def to_dict(self):
         return {

@@ -54,8 +54,10 @@ class ManageCustomer:
     def tim_kiem_nang_cao(self, loai=None, ten_chua=None, tong_gia_min=None, tong_gia_max=None, so_lan_mua_min=None, ma_kh=None, sdt_chua=None, email_chua=None):
         ket_qua = []
         for kh in self.danh_sach_khach_hang:
+            # Kiểm tra loại khách hàng
             if loai and not ((loai == 'Loyal' and isinstance(kh, LoyalCustomer)) or (loai == 'Casual' and isinstance(kh, CasualCustomer))):
                 continue
+            # Kiểm tra thông tin cơ bản
             if ten_chua and ten_chua.lower() not in kh.ten_khach_hang.lower():
                 continue
             if ma_kh and kh.ma_khach_hang != ma_kh:
@@ -64,13 +66,15 @@ class ManageCustomer:
                 continue
             if email_chua and email_chua.lower() not in kh.email.lower():
                 continue
+            
+            # Kiểm tra thông tin đặc biệt cho khách hàng vãng lai
             if isinstance(kh, CasualCustomer):
                 if tong_gia_min is not None and kh.tong_gia_tri_mua_hang < tong_gia_min:
                     continue
-                if tong_gia_max and kh.tong_gia_tri_mua_hang > tong_gia_max:
-                   continue
-                if so_lan_mua_min and kh.so_lan_mua_hang < so_lan_mua_min:
-                   continue
+                if tong_gia_max is not None and kh.tong_gia_tri_mua_hang > tong_gia_max:
+                    continue
+                if so_lan_mua_min is not None and kh.so_lan_mua_hang < so_lan_mua_min:
+                    continue
             ket_qua.append(kh)
         return ket_qua
 
@@ -88,7 +92,7 @@ class ManageCustomer:
             if kh.so_dien_thoai == khach_hang.so_dien_thoai:
                print("\033[91mSố điện thoại đã tồn tại!\033[0m")
                return
-            if kh.email == khach_hang.email:
+            if kh.email and kh.email == khach_hang.email and khach_hang.email:
                print("\033[91mEmail đã tồn tại!\033[0m")
                return
 
@@ -100,9 +104,22 @@ class ManageCustomer:
     def sua_thong_tin(self, ma_khach_hang, ten_moi=None, email_moi=None, sdt_moi=None):
         kh = next((k for k in self.danh_sach_khach_hang if k.ma_khach_hang == ma_khach_hang), None)
         if kh:
+            # Kiểm tra trùng lặp số điện thoại và email
+            if sdt_moi and sdt_moi != kh.so_dien_thoai:
+                if any(k.so_dien_thoai == sdt_moi for k in self.danh_sach_khach_hang if k.ma_khach_hang != ma_khach_hang):
+                    print("\033[91mSố điện thoại đã tồn tại!\033[0m")
+                    return
+                    
+            if email_moi and email_moi != kh.email:
+                if any(k.email == email_moi for k in self.danh_sach_khach_hang if k.ma_khach_hang != ma_khach_hang and k.email):
+                    print("\033[91mEmail đã tồn tại!\033[0m")
+                    return
+            
+            # Cập nhật thông tin
             if ten_moi:   kh.ten_khach_hang = ten_moi
             if email_moi: kh.email = email_moi
-            if sdt_moi: kh.so_dien_thoai = sdt_moi
+            if sdt_moi:   kh.so_dien_thoai = sdt_moi
+            
             self.ghi_file()
             ghi_log('Sửa', kh)
             print("\033[92m✔ Cập nhật thành công.\033[0m")
@@ -118,6 +135,8 @@ class ManageCustomer:
                 self.ghi_file()
                 ghi_log('Xóa', kh)
                 print("\033[92m✔ Xóa thành công.\033[0m")
+            else:
+                print("\033[93mĐã hủy xóa khách hàng.\033[0m")
         else:
             print("\033[91mKhông tìm thấy khách hàng.\033[0m")
 
@@ -140,16 +159,24 @@ class ManageCustomer:
         kh.so_lan_mua_hang += so_lan_mua
         kh.tong_gia_tri_mua_hang += gia_tri
 
-        # Kiểm tra điều kiện nâng cấp
+        # Kiểm tra điều kiện nâng cấp: tổng giá trị > 2.000.000 VND
         if kh.tong_gia_tri_mua_hang > 2000000:
-           diem_tich_luy = kh.tong_gia_tri_mua_hang // 10000  # Quy đổi 10.000 VND = 1 điểm
+           # Quy đổi điểm tích lũy theo tỷ lệ 10.000 VND = 1 điểm
+           diem_tich_luy = int(kh.tong_gia_tri_mua_hang // 10000)
+           
+           # Xóa khách hàng vãng lai
            self.danh_sach_khach_hang.remove(kh)
-           kh_moi = LoyalCustomer(kh.ma_khach_hang, kh.ten_khach_hang, kh.so_dien_thoai, kh.email)
-           kh_moi.diem_tich_luy = diem_tich_luy
+           
+           # Tạo khách hàng thân thiết mới với cùng thông tin cơ bản
+           kh_moi = LoyalCustomer(kh.ma_khach_hang, kh.ten_khach_hang, kh.so_dien_thoai, kh.email, diem_tich_luy)
            self.danh_sach_khach_hang.append(kh_moi)
-           print(f"\033[94mKhách hàng đã trở thành khách thân thiết! (Điểm tích lũy: {diem_tich_luy})\033[0m")
+           
+           print(f"\033[94m✨ Khách hàng đã được nâng cấp thành khách hàng thân thiết!\033[0m")
+           print(f"\033[94m🎁 Điểm tích lũy khởi đầu: {diem_tich_luy} điểm\033[0m")
            ghi_log('Chuyển sang khách thân thiết', kh_moi)
         else:
+           # Chưa đủ điều kiện nâng cấp
+           print(f"\033[93mKhách hàng cần mua thêm {2000000 - kh.tong_gia_tri_mua_hang:,.0f} VND để trở thành khách hàng thân thiết.\033[0m")
            ghi_log('Cập nhật mua hàng', kh)
 
         self.ghi_file()
@@ -165,15 +192,28 @@ class ManageCustomer:
         elif loai == 'Casual':
             ds_hien_thi = [kh for kh in self.danh_sach_khach_hang if isinstance(kh, CasualCustomer)]
         
+        # Kiểm tra xem danh sách có rỗng không
+        if not ds_hien_thi:
+            print("\033[93mKhông có khách hàng nào.\033[0m")
+            return
+            
         # Sắp xếp nếu có chỉ định
         if key_sort:
-            ds_hien_thi.sort(key=lambda x: getattr(x, key_sort, ''), reverse=reverse)
+            try:
+                ds_hien_thi.sort(key=lambda x: getattr(x, key_sort, ''), reverse=reverse)
+            except AttributeError:
+                print(f"\033[91mTrường '{key_sort}' không tồn tại. Không thể sắp xếp.\033[0m")
 
+        # Hiển thị tiêu đề
+        print(f"\n📋 DANH SÁCH KHÁCH HÀNG {loai if loai else 'TẤT CẢ'}")
         header = f"{'Mã KH':<10} | {'Tên KH':<20} | {'SĐT':<12} | {'Email':<25} | {'Số lần':<8} | {'Tổng tiền':<10} | {'Loại':<7}"
         print("\033[96m" + header + "\033[0m")
         print("-" * len(header))
+        
         for kh in ds_hien_thi:
             self.in_thong_tin(kh)
+            
+        print(f"\nTổng số: {len(ds_hien_thi)} khách hàng")
 
     def in_thong_tin(self, kh):
         if isinstance(kh, CasualCustomer):
@@ -184,13 +224,18 @@ class ManageCustomer:
 
     def thong_ke(self):
         """Thống kê số lượng và doanh thu theo loại khách hàng"""
-        loyal = sum(1 for kh in self.danh_sach_khach_hang if isinstance(kh, LoyalCustomer))
-        casual = sum(1 for kh in self.danh_sach_khach_hang if isinstance(kh, CasualCustomer))
-        doanh_thu = sum(kh.tong_gia_tri_mua_hang for kh in self.danh_sach_khach_hang if isinstance(kh, CasualCustomer))
-
-        # Tính trung bình cho từng loại khách hàng
+        # Đếm số lượng khách hàng theo loại
+        loyal_customers = [kh for kh in self.danh_sach_khach_hang if isinstance(kh, LoyalCustomer)]
         casual_customers = [kh for kh in self.danh_sach_khach_hang if isinstance(kh, CasualCustomer)]
-        tb_casual = sum(kh.tong_gia_tri_mua_hang for kh in casual_customers) / len(casual_customers) if casual_customers else 0
+        loyal = len(loyal_customers)
+        casual = len(casual_customers)
+        
+        # Tính tổng doanh thu và trung bình
+        doanh_thu = sum(kh.tong_gia_tri_mua_hang for kh in casual_customers)
+        tb_casual = doanh_thu / casual if casual else 0
+        
+        # Tính trung bình điểm tích lũy cho khách thân thiết
+        tb_diem = sum(kh.diem_tich_luy for kh in loyal_customers) / loyal if loyal else 0
 
         print("\n=== THỐNG KÊ KHÁCH HÀNG ===")
         print(f"Tổng số khách hàng: {loyal + casual}")
@@ -198,38 +243,68 @@ class ManageCustomer:
         print(f"- Khách hàng vãng lai: {casual}")
         print(f"Tổng doanh thu: {doanh_thu:,.0f} VND")
         print(f"Trung bình giá trị mua hàng của khách vãng lai: {tb_casual:,.0f} VND")
+        print(f"Trung bình điểm tích lũy của khách thân thiết: {tb_diem:,.0f} điểm")
 
+        # Lưu thống kê ra file CSV
         with open('thongke.csv', 'w', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
             writer.writerow(['Loại', 'Số lượng', 'Doanh thu', 'Trung bình'])
-            writer.writerow(['Loyal', loyal, '-', '-'])
-            writer.writerow(['Casual', casual, doanh_thu, f"{tb_casual:.0f}"])
+            writer.writerow(['Loyal', loyal, '-', f"{tb_diem:.0f} điểm"])
+            writer.writerow(['Casual', casual, doanh_thu, f"{tb_casual:.0f} VND"])
             writer.writerow(['Tổng', loyal + casual, doanh_thu, '-'])
+        print("✅ Đã lưu thống kê vào file: thongke.csv")
 
-        labels = ['Loyal', 'Casual']
+        # Vẽ biểu đồ phân bố khách hàng
+        labels = ['Khách thân thiết', 'Khách vãng lai']
         values = [loyal, casual]
         plt.figure(figsize=(10, 6))
         plt.bar(labels, values, color=['green', 'blue'])
         plt.title('Thống kê số lượng khách hàng')
         plt.xlabel('Loại khách hàng')
         plt.ylabel('Số lượng')
-        plt.savefig('thongke.png')
+        plt.savefig('thongke_soluong.png')
+        
+        # Vẽ biểu đồ doanh thu nếu có khách hàng vãng lai
+        if casual > 0:
+            # Tính doanh thu trung bình theo từng khách hàng vãng lai
+            ten_khach_hang = [kh.ten_khach_hang for kh in casual_customers]
+            doanh_thu_values = [kh.tong_gia_tri_mua_hang for kh in casual_customers]
+            
+            plt.figure(figsize=(12, 6))
+            plt.bar(ten_khach_hang, doanh_thu_values, color='orange')
+            plt.title('Doanh thu theo khách hàng vãng lai')
+            plt.xlabel('Khách hàng')
+            plt.ylabel('Doanh thu (VND)')
+            plt.xticks(rotation=45)
+            plt.tight_layout()
+            plt.savefig('thongke_doanhthu.png')
+        
         plt.show()
 
     def hien_thi_top_khach_hang(self, n=3):
         """Hiển thị n khách hàng có giá trị mua hàng cao nhất"""
         # Lọc các khách hàng vãng lai
         casual_customers = [kh for kh in self.danh_sach_khach_hang if isinstance(kh, CasualCustomer)]
+        
+        if not casual_customers:
+            print("\033[93mKhông có khách hàng vãng lai nào để hiển thị.\033[0m")
+            return []
+            
         # Sắp xếp theo giá trị mua hàng giảm dần
         casual_customers.sort(key=lambda kh: kh.tong_gia_tri_mua_hang, reverse=True)
+        
         # Lấy n khách hàng đầu tiên
         top_n = casual_customers[:n]
         
         print(f"\n=== TOP {n} KHÁCH HÀNG MUA HÀNG NHIỀU NHẤT ===")
+        if not top_n:
+            print("\033[93mKhông có đủ khách hàng để hiển thị.\033[0m")
+            return []
+            
         print(f"{'Mã KH':<10} | {'Tên KH':<20} | {'Số lần':<8} | {'Tổng giá trị':<15}")
         print("-" * 60)
-        for kh in top_n:
-            print(f"{kh.ma_khach_hang:<10} | {kh.ten_khach_hang:<20} | {kh.so_lan_mua_hang:<8} | {kh.tong_gia_tri_mua_hang:<15,.0f}")
+        for i, kh in enumerate(top_n, 1):
+            print(f"{i}. {kh.ma_khach_hang:<8} | {kh.ten_khach_hang:<20} | {kh.so_lan_mua_hang:<8} | {kh.tong_gia_tri_mua_hang:<15,.0f}")
         
         return top_n
 
@@ -239,16 +314,24 @@ class ManageCustomer:
         kh_tiem_nang = [kh for kh in self.danh_sach_khach_hang 
                        if isinstance(kh, LoyalCustomer) and kh.diem_tich_luy > 500]
         
-        # Sắp xếp theo điểm tích lũy giảm dần (vì không có trung bình giá trị cho LoyalCustomer)
+        if not kh_tiem_nang:
+            print("\033[93mKhông có khách hàng thân thiết nào có đủ điểm (>500) để nhận quà Tết.\033[0m")
+            return []
+            
+        # Sắp xếp theo điểm tích lũy giảm dần
         kh_tiem_nang.sort(key=lambda kh: kh.diem_tich_luy, reverse=True)
+        
+        # Giới hạn top 10 khách hàng
         top_10 = kh_tiem_nang[:10]
 
         print("\n🎁 DANH SÁCH KHÁCH HÀNG ĐƯỢC NHẬN QUÀ TẾT 🎁")
         print(f"{'Mã KH':<10} | {'Tên KH':<20} | {'SĐT':<12} | {'Email':<25} | {'Điểm tích lũy':<15}")
         print("-" * 85)
-        for kh in top_10:
-            print(f"{kh.ma_khach_hang:<10} | {kh.ten_khach_hang:<20} | {kh.so_dien_thoai:<12} | {kh.email:<25} | {kh.diem_tich_luy:<15}")
+        
+        for i, kh in enumerate(top_10, 1):
+            print(f"{i}. {kh.ma_khach_hang:<8} | {kh.ten_khach_hang:<20} | {kh.so_dien_thoai:<12} | {kh.email:<25} | {kh.diem_tich_luy:<15}")
 
+        # Lưu danh sách ra file CSV
         with open("khach_hang_tet.csv", "w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow(["MaKH", "TenKH", "SDT", "Email", "DiemTichLuy"])
@@ -261,4 +344,5 @@ class ManageCustomer:
                     kh.diem_tich_luy
                 ])
         print("✅ Đã lưu danh sách vào file: khach_hang_tet.csv")
+        
         return top_10
