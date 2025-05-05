@@ -13,6 +13,7 @@ class ManageCustomer:
         self.doc_file()
 
     def backup_file(self):
+        """Tạo bản sao lưu cho file dữ liệu"""
         if os.path.exists(self.filename):
             now = datetime.datetime.now()
             timestamp = now.strftime("%Y%m%d_%H%M%S")
@@ -20,26 +21,65 @@ class ManageCustomer:
             try:
                 shutil.copy(self.filename, backup_filename)
                 print(f"\033[92mĐã tạo bản sao lưu: {backup_filename}\033[0m")
+                return True
             except Exception as e:
                 print(f"\033[91mLỗi sao lưu file: {e}\033[0m")
+                return False
+        return False
 
     def doc_file(self):
+        """Đọc dữ liệu khách hàng từ file CSV"""
         if not os.path.exists(self.filename):
+            # Tạo file mới nếu chưa tồn tại
+            try:
+                with open(self.filename, 'w', newline='', encoding='utf-8') as f:
+                    fieldnames = ['Loai', 'MaKH', 'TenKH', 'SDT', 'Email', 'SoLanMua', 'TongGiaTri', 'DiemTichLuy']
+                    writer = csv.DictWriter(f, fieldnames=fieldnames)
+                    writer.writeheader()
+                print(f"\033[92mĐã tạo file dữ liệu mới: {self.filename}\033[0m")
+            except Exception as e:
+                print(f"\033[91mLỗi tạo file mới: {e}\033[0m")
             return
+        
         try:
             with open(self.filename, 'r', newline='', encoding='utf-8') as f:
                 reader = csv.DictReader(f)
                 for row in reader:
-                    if row['Loai'] == 'Loyal':
-                       kh = LoyalCustomer.from_dict(row)
-                    else:
-                       kh = CasualCustomer.from_dict(row)
-                    self.danh_sach_khach_hang.append(kh)
+                    try:
+                        if row['Loai'] == 'Loyal':
+                            kh = LoyalCustomer.from_dict(row)
+                        else:
+                            kh = CasualCustomer.from_dict(row)
+                        self.danh_sach_khach_hang.append(kh)
+                    except Exception as e:
+                        print(f"\033[91mLỗi đọc dòng dữ liệu: {e}\033[0m")
+                        continue
+            print(f"\033[92mĐã đọc {len(self.danh_sach_khach_hang)} khách hàng từ file\033[0m")
         except Exception as e:
-              print(f"\033[91mLỗi đọc file: {e}\033[0m")         
+            print(f"\033[91mLỗi đọc file: {e}\033[0m")
+            # Tạo bản sao lưu của file lỗi và tạo file mới
+            if os.path.exists(self.filename):
+                corrupt_file = f"{self.filename}.corrupt_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
+                try:
+                    shutil.copy(self.filename, corrupt_file)
+                    print(f"\033[93mĐã lưu file lỗi tại: {corrupt_file}\033[0m")
+                    # Tạo file mới
+                    with open(self.filename, 'w', newline='', encoding='utf-8') as f:
+                        fieldnames = ['Loai', 'MaKH', 'TenKH', 'SDT', 'Email', 'SoLanMua', 'TongGiaTri', 'DiemTichLuy']
+                        writer = csv.DictWriter(f, fieldnames=fieldnames)
+                        writer.writeheader()
+                    print(f"\033[92mĐã tạo file dữ liệu mới: {self.filename}\033[0m")
+                except Exception as e2:
+                    print(f"\033[91mKhông thể khôi phục file lỗi: {e2}\033[0m")
 
     def ghi_file(self):
-        self.backup_file()
+        """Ghi danh sách khách hàng vào file CSV"""
+        if not self.backup_file():
+            confirm = input("\033[93mKhông thể sao lưu file. Bạn có muốn tiếp tục lưu? (y/n): \033[0m")
+            if confirm.lower() != 'y':
+                print("\033[93mĐã hủy thao tác lưu file.\033[0m")
+                return False
+                
         try:
             with open(self.filename, 'w', newline='', encoding='utf-8') as f:
                 fieldnames = ['Loai', 'MaKH', 'TenKH', 'SDT', 'Email', 'SoLanMua', 'TongGiaTri', 'DiemTichLuy']
@@ -48,16 +88,58 @@ class ManageCustomer:
                 for kh in self.danh_sach_khach_hang:
                     writer.writerow(kh.to_dict())
             print("\033[92mLưu file thành công\033[0m")
+            return True
         except Exception as e:
             print(f"\033[91mLỗi ghi file: {e}\033[0m")
+            return False
 
-    def tim_kiem_nang_cao(self, loai=None, ten_chua=None, tong_gia_min=None, tong_gia_max=None, so_lan_mua_min=None, ma_kh=None, sdt_chua=None, email_chua=None):
-        """Hàm tìm kiếm nâng cao với nhiều tiêu chí"""
+    def la_ma_kh_hop_le(self, ma_kh):
+        """Kiểm tra mã khách hàng có hợp lệ không"""
+        if not ma_kh or not isinstance(ma_kh, str) or len(ma_kh) < 3:
+            return False
+        return True
+        
+    def la_sdt_hop_le(self, sdt):
+        """Kiểm tra số điện thoại có hợp lệ không"""
+        if not sdt or not isinstance(sdt, str):
+            return False
+        # Chỉ chấp nhận số điện thoại có 10 hoặc 11 chữ số
+        return sdt.isdigit() and (len(sdt) == 10 or len(sdt) == 11)
+        
+    def la_email_hop_le(self, email):
+        """Kiểm tra email có hợp lệ không"""
+        if not email:  # Email có thể để trống
+            return True
+        if not isinstance(email, str):
+            return False
+        # Kiểm tra email có đúng định dạng không (kiểm tra đơn giản)
+        return '@' in email and '.' in email.split('@')[-1]
+
+    def tim_kiem_nang_cao(self, loai=None, ten_chua=None, tong_gia_min=None, tong_gia_max=None, 
+                          so_lan_mua_min=None, ma_kh=None, sdt_chua=None, email_chua=None, 
+                          diem_tich_luy_min=None):
+        """Hàm tìm kiếm nâng cao với nhiều tiêu chí
+        
+        Args:
+            loai (str): 'Loyal' hoặc 'Casual'
+            ten_chua (str): Chuỗi có trong tên khách hàng
+            tong_gia_min (float): Giá trị mua hàng tối thiểu
+            tong_gia_max (float): Giá trị mua hàng tối đa
+            so_lan_mua_min (int): Số lần mua hàng tối thiểu
+            ma_kh (str): Mã khách hàng cần tìm
+            sdt_chua (str): Chuỗi có trong số điện thoại
+            email_chua (str): Chuỗi có trong email
+            diem_tich_luy_min (int): Điểm tích lũy tối thiểu
+            
+        Returns:
+            list: Danh sách khách hàng phù hợp với điều kiện
+        """
         ket_qua = []
         for kh in self.danh_sach_khach_hang:
             # Kiểm tra loại khách hàng
             if loai and not ((loai == 'Loyal' and isinstance(kh, LoyalCustomer)) or (loai == 'Casual' and isinstance(kh, CasualCustomer))):
                 continue
+                
             # Kiểm tra thông tin cơ bản
             if ten_chua and ten_chua.lower() not in kh.ten_khach_hang.lower():
                 continue
@@ -65,7 +147,7 @@ class ManageCustomer:
                 continue
             if sdt_chua and sdt_chua not in kh.so_dien_thoai:
                 continue
-            if email_chua and email_chua.lower() not in kh.email.lower():
+            if email_chua and (not kh.email or email_chua.lower() not in kh.email.lower()):
                 continue
             
             # Kiểm tra thông tin đặc biệt cho khách hàng vãng lai
@@ -76,45 +158,93 @@ class ManageCustomer:
                     continue
                 if so_lan_mua_min is not None and kh.so_lan_mua_hang < so_lan_mua_min:
                     continue
+            
+            # Kiểm tra điểm tích lũy cho khách hàng thân thiết
+            if isinstance(kh, LoyalCustomer) and diem_tich_luy_min is not None and kh.diem_tich_luy < diem_tich_luy_min:
+                continue
+                
             ket_qua.append(kh)
         return ket_qua
 
     def them_khach_hang(self, khach_hang):
+        """Thêm khách hàng mới vào hệ thống
+        
+        Args:
+            khach_hang: Đối tượng LoyalCustomer hoặc CasualCustomer
+            
+        Returns:
+            bool: True nếu thêm thành công, False nếu thất bại
+        """
         # Kiểm tra thông tin bắt buộc
-        if not khach_hang.ma_khach_hang or not khach_hang.so_dien_thoai:
-            print("\033[91mMã khách hàng và Số điện thoại là bắt buộc!\033[0m")
-            return
+        if not self.la_ma_kh_hop_le(khach_hang.ma_khach_hang):
+            print("\033[91mMã khách hàng không hợp lệ!\033[0m")
+            return False
+            
+        if not self.la_sdt_hop_le(khach_hang.so_dien_thoai):
+            print("\033[91mSố điện thoại không hợp lệ!\033[0m")
+            return False
+            
+        if not self.la_email_hop_le(khach_hang.email):
+            print("\033[91mEmail không hợp lệ!\033[0m")
+            return False
 
         # Kiểm tra trùng lặp
         for kh in self.danh_sach_khach_hang:
             if kh.ma_khach_hang == khach_hang.ma_khach_hang:
                print("\033[91mMã khách hàng đã tồn tại!\033[0m")
-               return
+               return False
             if kh.so_dien_thoai == khach_hang.so_dien_thoai:
                print("\033[91mSố điện thoại đã tồn tại!\033[0m")
-               return
+               return False
             if kh.email and kh.email == khach_hang.email and khach_hang.email:
                print("\033[91mEmail đã tồn tại!\033[0m")
-               return
+               return False
 
         self.danh_sach_khach_hang.append(khach_hang)
         self.ghi_file()
         ghi_log("Thêm", khach_hang)
         print("\033[92m✔ Thêm khách hàng thành công.\033[0m")
+        return True
 
     def sua_thong_tin(self, ma_khach_hang, ten_moi=None, email_moi=None, sdt_moi=None):
+        """Sửa thông tin khách hàng
+        
+        Args:
+            ma_khach_hang (str): Mã khách hàng cần sửa
+            ten_moi (str, optional): Tên mới của khách hàng
+            email_moi (str, optional): Email mới của khách hàng
+            sdt_moi (str, optional): Số điện thoại mới của khách hàng
+            
+        Returns:
+            bool: True nếu sửa thành công, False nếu thất bại
+        """
+        # Kiểm tra mã khách hàng
+        if not self.la_ma_kh_hop_le(ma_khach_hang):
+            print("\033[91mMã khách hàng không hợp lệ!\033[0m")
+            return False
+            
+        # Kiểm tra số điện thoại mới
+        if sdt_moi and not self.la_sdt_hop_le(sdt_moi):
+            print("\033[91mSố điện thoại mới không hợp lệ!\033[0m")
+            return False
+            
+        # Kiểm tra email mới
+        if email_moi and not self.la_email_hop_le(email_moi):
+            print("\033[91mEmail mới không hợp lệ!\033[0m")
+            return False
+        
         kh = next((k for k in self.danh_sach_khach_hang if k.ma_khach_hang == ma_khach_hang), None)
         if kh:
             # Kiểm tra trùng lặp số điện thoại và email
             if sdt_moi and sdt_moi != kh.so_dien_thoai:
                 if any(k.so_dien_thoai == sdt_moi for k in self.danh_sach_khach_hang if k.ma_khach_hang != ma_khach_hang):
                     print("\033[91mSố điện thoại đã tồn tại!\033[0m")
-                    return
+                    return False
                     
             if email_moi and email_moi != kh.email:
                 if any(k.email == email_moi for k in self.danh_sach_khach_hang if k.ma_khach_hang != ma_khach_hang and k.email):
                     print("\033[91mEmail đã tồn tại!\033[0m")
-                    return
+                    return False
             
             # Cập nhật thông tin
             if ten_moi:   kh.ten_khach_hang = ten_moi
@@ -124,10 +254,25 @@ class ManageCustomer:
             self.ghi_file()
             ghi_log('Sửa', kh)
             print("\033[92m✔ Cập nhật thành công.\033[0m")
+            return True
         else:
             print("\033[91mKhông tìm thấy khách hàng.\033[0m")
+            return False
 
     def xoa_khach_hang(self, ma_khach_hang):
+        """Xoá khách hàng khỏi hệ thống
+        
+        Args:
+            ma_khach_hang (str): Mã khách hàng cần xoá
+            
+        Returns:
+            bool: True nếu xoá thành công, False nếu thất bại
+        """
+        # Kiểm tra mã khách hàng
+        if not self.la_ma_kh_hop_le(ma_khach_hang):
+            print("\033[91mMã khách hàng không hợp lệ!\033[0m")
+            return False
+            
         kh = next((k for k in self.danh_sach_khach_hang if k.ma_khach_hang == ma_khach_hang), None)
         if kh:
             confirm = input("\033[91mBạn có chắc chắn muốn xoá khách hàng này? (y/n): \033[0m")
@@ -136,22 +281,47 @@ class ManageCustomer:
                 self.ghi_file()
                 ghi_log('Xóa', kh)
                 print("\033[92m✔ Xóa thành công.\033[0m")
+                return True
             else:
                 print("\033[93mĐã hủy xóa khách hàng.\033[0m")
+                return False
         else:
             print("\033[91mKhông tìm thấy khách hàng.\033[0m")
+            return False
 
     def cap_nhat_mua_hang(self, ma_khach_hang, so_lan_mua, gia_tri):
-        """Cập nhật thông tin mua hàng"""
+        """Cập nhật thông tin mua hàng
+        
+        Args:
+            ma_khach_hang (str): Mã khách hàng
+            so_lan_mua (int): Số lần mua hàng cần cập nhật
+            gia_tri (float): Giá trị mua hàng cần cập nhật
+            
+        Returns:
+            bool: True nếu cập nhật thành công, False nếu thất bại
+        """
+        # Kiểm tra mã khách hàng
+        if not self.la_ma_kh_hop_le(ma_khach_hang):
+            print("\033[91mMã khách hàng không hợp lệ!\033[0m")
+            return False
+            
+        # Kiểm tra giá trị đầu vào
+        try:
+            so_lan_mua = int(so_lan_mua)
+            gia_tri = float(gia_tri)
+        except ValueError:
+            print("\033[91mSố lần mua hoặc giá trị không hợp lệ!\033[0m")
+            return False
+            
+        if so_lan_mua < 0 or gia_tri < 0:
+            print("\033[91mGiá trị mua hàng không hợp lệ.\033[0m")
+            return False
+
         kh = next((k for k in self.danh_sach_khach_hang if k.ma_khach_hang == ma_khach_hang), None)
 
         if kh is None:
            print("\033[91mKhông tìm thấy khách hàng.\033[0m")
-           return
-
-        if so_lan_mua < 0 or gia_tri < 0:
-           print("\033[91mGiá trị mua hàng không hợp lệ.\033[0m")
-           return
+           return False
 
         # Xử lý khách hàng thân thiết
         if isinstance(kh, LoyalCustomer):
@@ -162,15 +332,15 @@ class ManageCustomer:
             print(f"\033[94m💰 Tổng điểm hiện tại: {kh.diem_tich_luy} điểm\033[0m")
             ghi_log('Cập nhật điểm tích lũy', kh)
             self.ghi_file()
-            return
+            return True
 
         # Xử lý khách hàng vãng lai
         # Cập nhật số lần và giá trị
         kh.so_lan_mua_hang += so_lan_mua
         kh.tong_gia_tri_mua_hang += gia_tri
 
-        # Kiểm tra điều kiện nâng cấp: tổng giá trị > 2.000.000 VND
-        if kh.tong_gia_tri_mua_hang > 2000000:
+        # Kiểm tra điều kiện nâng cấp: tổng giá trị > 2.000.000 VND và số lần mua ≥ 3
+        if kh.tong_gia_tri_mua_hang > 2000000 and kh.so_lan_mua_hang >= 3:
            # Quy đổi điểm tích lũy theo tỷ lệ 10.000 VND = 1 điểm
            diem_tich_luy = int(kh.tong_gia_tri_mua_hang // 10000)
            
@@ -186,50 +356,84 @@ class ManageCustomer:
            ghi_log('Chuyển sang khách thân thiết', kh_moi)
         else:
            # Chưa đủ điều kiện nâng cấp
-           print(f"\033[93mKhách hàng cần mua thêm {2000000 - kh.tong_gia_tri_mua_hang:,.0f} VND để trở thành khách hàng thân thiết.\033[0m")
+           print(f"\033[93mĐiều kiện nâng cấp: Tổng giá trị > 2.000.000 VND và số lần mua ≥ 3\033[0m")
+           if kh.tong_gia_tri_mua_hang <= 2000000:
+               print(f"\033[93mKhách hàng cần mua thêm {2000000 - kh.tong_gia_tri_mua_hang:,.0f} VND để đủ điều kiện.\033[0m")
+           if kh.so_lan_mua_hang < 3:
+               print(f"\033[93mKhách hàng cần mua thêm {3 - kh.so_lan_mua_hang} lần để đủ điều kiện.\033[0m")
            ghi_log('Cập nhật mua hàng', kh)
 
         self.ghi_file()
         print("\033[92m✔ Cập nhật mua hàng thành công.\033[0m")
+        return True
 
     def cap_nhat_diem_tich_luy(self, ma_khach_hang, diem_moi):
-        """Cập nhật trực tiếp điểm tích lũy cho khách hàng thân thiết"""
+        """Cập nhật trực tiếp điểm tích lũy cho khách hàng thân thiết
+        
+        Args:
+            ma_khach_hang (str): Mã khách hàng
+            diem_moi (int): Điểm tích lũy mới
+            
+        Returns:
+            bool: True nếu cập nhật thành công, False nếu thất bại
+        """
+        # Kiểm tra mã khách hàng
+        if not self.la_ma_kh_hop_le(ma_khach_hang):
+            print("\033[91mMã khách hàng không hợp lệ!\033[0m")
+            return False
+            
         kh = next((k for k in self.danh_sach_khach_hang if k.ma_khach_hang == ma_khach_hang), None)
         
         if kh is None:
             print("\033[91mKhông tìm thấy khách hàng.\033[0m")
-            return
+            return False
             
         if not isinstance(kh, LoyalCustomer):
             print("\033[91mKhông áp dụng cho khách vãng lai.\033[0m")
-            return
+            return False
             
         try:
             diem_moi = int(diem_moi)
             if diem_moi < 0:
                 print("\033[91mĐiểm tích lũy không thể là số âm.\033[0m")
-                return
+                return False
                 
             kh.diem_tich_luy = diem_moi
             self.ghi_file()
             ghi_log('Cập nhật điểm tích lũy', kh)
             print(f"\033[92m✔ Cập nhật điểm tích lũy thành công: {diem_moi} điểm\033[0m")
+            return True
         except ValueError:
             print("\033[91mĐiểm tích lũy phải là số nguyên.\033[0m")
+            return False
 
     def them_diem_tich_luy(self, ma_khach_hang, diem_them):
-        """Thêm điểm tích lũy cho khách hàng thân thiết"""
+        """Thêm điểm tích lũy cho khách hàng thân thiết
+        
+        Args:
+            ma_khach_hang (str): Mã khách hàng
+            diem_them (int): Số điểm thêm vào
+            
+        Returns:
+            bool: True nếu thêm điểm thành công, False nếu thất bại
+        """
+        # Kiểm tra mã khách hàng
+        if not self.la_ma_kh_hop_le(ma_khach_hang):
+            print("\033[91mMã khách hàng không hợp lệ!\033[0m")
+            return False
+            
         kh = next((k for k in self.danh_sach_khach_hang if k.ma_khach_hang == ma_khach_hang), None)
         
         if kh is None:
             print("\033[91mKhông tìm thấy khách hàng.\033[0m")
-            return
+            return False
             
         if not isinstance(kh, LoyalCustomer):
             print("\033[91mKhông áp dụng cho khách vãng lai.\033[0m")
-            return
+            return False
             
         try:
+            
             diem_them = int(diem_them)
             kh.diem_tich_luy += diem_them
             
