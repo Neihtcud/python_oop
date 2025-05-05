@@ -5,6 +5,8 @@ import datetime
 import matplotlib.pyplot as plt
 from models.customer import LoyalCustomer, CasualCustomer
 from utils.logger import ghi_log
+from utils.helpers import read_customers_from_csv, write_customers_to_csv
+    # ... Các phương thức khác của lớp ...
 
 class ManageCustomer:
     def __init__(self, filename='khachhang.csv'):
@@ -92,6 +94,7 @@ class ManageCustomer:
         except Exception as e:
             print(f"\033[91mLỗi ghi file: {e}\033[0m")
             return False
+
 
     def la_ma_kh_hop_le(self, ma_kh):
         """Kiểm tra mã khách hàng có hợp lệ không"""

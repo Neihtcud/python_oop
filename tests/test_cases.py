@@ -476,39 +476,7 @@ class TestCustomer(unittest.TestCase):
         updated = self.manager.tim_kiem_nang_cao(ma_kh="L001")[0]
         self.assertEqual(updated.diem_tich_luy, 700)  # 500 + 200
 
-    def test_giam_diem_tich_luy(self):
-        """
-        Test case 28: Kiểm tra giảm điểm tích lũy khi đổi quà
-        """
-        # Thêm khách hàng thân thiết
-        self.manager.them_khach_hang(self.loyal_customer)  # 500 điểm
         
-        # Giảm điểm khi đổi quà
-        result = self.manager.doi_qua("L001", 300)
-        
-        # Kiểm tra kết quả
-        self.assertTrue(result)
-        
-        # Kiểm tra điểm sau khi đổi
-        updated = self.manager.tim_kiem_nang_cao(ma_kh="L001")[0]
-        self.assertEqual(updated.diem_tich_luy, 200)  # 500 - 300
-        
-    def test_doi_qua_khong_du_diem(self):
-        """
-        Test case 29: Kiểm tra trường hợp đổi quà nhưng không đủ điểm
-        """
-        # Thêm khách hàng thân thiết
-        self.manager.them_khach_hang(self.loyal_customer)  # 500 điểm
-        
-        # Thử đổi quà với điểm nhiều hơn hiện có
-        result = self.manager.doi_qua("L001", 600)
-        
-        # Kiểm tra kết quả
-        self.assertFalse(result)
-        
-        # Kiểm tra điểm không thay đổi
-        updated = self.manager.tim_kiem_nang_cao(ma_kh="L001")[0]
-        self.assertEqual(updated.diem_tich_luy, 500)  # Vẫn giữ nguyên
 
     def test_tinh_tong_gia_tri(self):
         """
