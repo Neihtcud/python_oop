@@ -256,45 +256,98 @@ class ManageCustomer:
             print("\033[91mĐiểm giảm phải là số nguyên.\033[0m")
 
     def hien_thi_danh_sach(self, key_sort=None, reverse=False, loai=None):
-        """Hiển thị danh sách khách hàng với tùy chọn lọc theo loại"""
-        ds_hien_thi = self.danh_sach_khach_hang
         
+        """Hiển thị danh sách khách hàng với tùy chọn lọc theo loại
+    
+        Args:
+            key_sort (str): Trường để sắp xếp
+            reverse (bool): True để sắp xếp giảm dần, False để sắp xếp tăng dần
+            loai (str): 'Loyal' cho khách hàng thân thiết, 'Casual' cho khách hàng vãng lai, None cho tất cả
+        """
+        ds_hien_thi = self.danh_sach_khach_hang.copy()
+    
         # Lọc theo loại nếu được chỉ định
         if loai == 'Loyal':
-            ds_hien_thi = [kh for kh in self.danh_sach_khach_hang if isinstance(kh, LoyalCustomer)]
+            ds_hien_thi = [kh for kh in ds_hien_thi if isinstance(kh, LoyalCustomer)]
         elif loai == 'Casual':
-            ds_hien_thi = [kh for kh in self.danh_sach_khach_hang if isinstance(kh, CasualCustomer)]
-        
+            ds_hien_thi = [kh for kh in ds_hien_thi if isinstance(kh, CasualCustomer)]
+    
         # Kiểm tra xem danh sách có rỗng không
         if not ds_hien_thi:
-            print("\033[93mKhông có khách hàng nào.\033[0m")
+            print("\033[93mKhông có khách hàng nào phù hợp với điều kiện.\033[0m")
             return
-            
-        # Sắp xếp nếu có chỉ định
+    
+        # Sắp xếp dữ liệu
         if key_sort:
-            try:
-                ds_hien_thi.sort(key=lambda x: getattr(x, key_sort, ''), reverse=reverse)
-            except AttributeError:
-                print(f"\033[91mTrường '{key_sort}' không tồn tại. Không thể sắp xếp.\033[0m")
+            if key_sort == 'diem_tich_luy' and loai != 'Casual':
+                # Chỉ áp dụng sắp xếp theo điểm tích lũy cho khách hàng thân thiết
+                # hoặc cho danh sách tổng hợp (sắp xếp khách thân thiết trước)
+                ds_loyal = [kh for kh in ds_hien_thi if isinstance(kh, LoyalCustomer)]
+                ds_casual = [kh for kh in ds_hien_thi if isinstance(kh, CasualCustomer)]
+                ds_loyal.sort(key=lambda x: x.diem_tich_luy, reverse=reverse)
+                ds_hien_thi = ds_loyal + ds_casual if not reverse else ds_loyal + ds_casual
+            elif key_sort == 'tong_gia_tri_mua_hang' and loai != 'Loyal':
+                # Chỉ áp dụng sắp xếp theo tổng giá trị cho khách hàng vãng lai
+                # hoặc cho danh sách tổng hợp (sắp xếp khách vãng lai trước)
+                ds_loyal = [kh for kh in ds_hien_thi if isinstance(kh, LoyalCustomer)]
+                ds_casual = [kh for kh in ds_hien_thi if isinstance(kh, CasualCustomer)]
+                ds_casual.sort(key=lambda x: x.tong_gia_tri_mua_hang, reverse=reverse)
+                ds_hien_thi = ds_casual + ds_loyal if not reverse else ds_casual + ds_loyal
+            else:
+                # Sắp xếp theo các trường thông thường (chung cho cả hai loại)
+                try:
+                   ds_hien_thi.sort(key=lambda x: getattr(x, key_sort, ''), reverse=reverse)
+                except AttributeError:
+                   print(f"\033[93mCảnh báo: Trường '{key_sort}' không tồn tại ở một số khách hàng. Sắp xếp có thể không chính xác.\033[0m")
 
-        # Hiển thị tiêu đề
-        print(f"\n📋 DANH SÁCH KHÁCH HÀNG {loai if loai else 'TẤT CẢ'}")
-        header = f"{'Mã KH':<10} | {'Tên KH':<20} | {'SĐT':<12} | {'Email':<25} | {'Số lần':<8} | {'Tổng tiền':<10} | {'Loại':<7}"
-        print("\033[96m" + header + "\033[0m")
-        print("-" * len(header))
+            # Hiển thị tiêu đề
+            loai_title = "THÂN THIẾT" if loai == 'Loyal' else "VÃNG LAI" if loai == 'Casual' else "TẤT CẢ"
+            print(f"\n📋 DANH SÁCH KHÁCH HÀNG {loai_title}")
+    
+            # Tiêu đề cột tùy theo loại khách hàng
+            if loai == 'Loyal':
+               header = f"{'Mã KH':<10} | {'Tên KH':<20} | {'SĐT':<12} | {'Email':<25} | {'Điểm tích lũy':<15}"
+               print("\033[96m" + header + "\033[0m")
+               print("-" * len(header))
         
-        for kh in ds_hien_thi:
-            self.in_thong_tin(kh)
+               for kh in ds_hien_thi:
+                  print(f"{kh.ma_khach_hang:<10} | {kh.ten_khach_hang:<20} | {kh.so_dien_thoai:<12} | {kh.email:<25} | {kh.diem_tich_luy:<15}")
+    
+            elif loai == 'Casual':
+               header = f"{'Mã KH':<10} | {'Tên KH':<20} | {'SĐT':<12} | {'Email':<25} | {'Số lần mua':<12} | {'Tổng giá trị':<15}"
+               print("\033[96m" + header + "\033[0m")
+               print("-" * len(header))
+        
+               for kh in ds_hien_thi:
+                 print(f"{kh.ma_khach_hang:<10} | {kh.ten_khach_hang:<20} | {kh.so_dien_thoai:<12} | {kh.email:<25} | {kh.so_lan_mua_hang:<12} | {kh.tong_gia_tri_mua_hang:15,.0f}")
+    
+            else:
+               # Hiển thị danh sách kết hợp
+               header = f"{'Mã KH':<10} | {'Tên KH':<20} | {'SĐT':<12} | {'Email':<25} | {'Loại KH':<10} | {'Chi tiết':<20}"
+               print("\033[96m" + header + "\033[0m")
+               print("-" * len(header))
+        
+               for kh in ds_hien_thi:
+                    if isinstance(kh, LoyalCustomer):
+                      chi_tiet = f"Điểm TL: {kh.diem_tich_luy}"
+                      loai_kh = "Thân thiết"
+                    else:
+                      chi_tiet = f"SL: {kh.so_lan_mua_hang}, GT: {kh.tong_gia_tri_mua_hang:,.0f}"
+                      loai_kh = "Vãng lai"
             
-        print(f"\nTổng số: {len(ds_hien_thi)} khách hàng")
-
+                    print(f"{kh.ma_khach_hang:<10} | {kh.ten_khach_hang:<20} | {kh.so_dien_thoai:<12} | {kh.email:<25} | {loai_kh:<10} | {chi_tiet:<20}")
+    
+            print(f"\nTổng số: {len(ds_hien_thi)} khách hàng")
     def in_thong_tin(self, kh):
+        """Hiển thị thông tin của một khách hàng
+    
+        Args:
+           kh: Đối tượng khách hàng (LoyalCustomer hoặc CasualCustomer)
+        """
         if isinstance(kh, CasualCustomer):
-            print(f"{kh.ma_khach_hang:<10} | {kh.ten_khach_hang:<20} | {kh.so_dien_thoai:<12} | {kh.email:<25} | {kh.so_lan_mua_hang:<8} | {kh.tong_gia_tri_mua_hang:<10,.0f} | Casual")
+           print(f"{kh.ma_khach_hang:<10} | {kh.ten_khach_hang:<20} | {kh.so_dien_thoai:<12} | {kh.email:<25} | Vãng lai | SL: {kh.so_lan_mua_hang}, GT: {kh.tong_gia_tri_mua_hang:,.0f} VND")
         else:
-            diem = getattr(kh, 'diem_tich_luy', 0)
-            print(f"{kh.ma_khach_hang:<10} | {kh.ten_khach_hang:<20} | {kh.so_dien_thoai:<12} | {kh.email:<25} | {'-':<8} | {'-':<10} | Loyal ({diem})")
-
+           print(f"{kh.ma_khach_hang:<10} | {kh.ten_khach_hang:<20} | {kh.so_dien_thoai:<12} | {kh.email:<25} | Thân thiết | Điểm TL: {kh.diem_tich_luy}")        
     def thong_ke(self):
         """Thống kê số lượng và doanh thu theo loại khách hàng"""
         # Đếm số lượng khách hàng theo loại
