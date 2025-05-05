@@ -202,7 +202,7 @@ class TestCustomer(unittest.TestCase):
         # Kiểm tra điểm tích lũy (2100000 / 10000 = 210 điểm)
         self.assertEqual(loyal_results[0].diem_tich_luy, 210)
 
-    def test_tim_kiem_nang_cao_theo_loai(self):
+    def test_tim_kiem_theo_loai(self):
         """
         Test case 13: Kiểm tra tìm kiếm nâng cao theo loại khách hàng
         """
@@ -211,16 +211,16 @@ class TestCustomer(unittest.TestCase):
         self.manager.them_khach_hang(self.casual_customer)
         
         # Tìm kiếm loyal customers
-        loyal_results = self.manager.tim_kiem_nang_cao(loai="Loyal")
+        loyal_results = self.manager.tim_kiem(loai="Loyal")
         self.assertEqual(len(loyal_results), 1)
         self.assertEqual(loyal_results[0].ma_khach_hang, "L001")
         
         # Tìm kiếm casual customers
-        casual_results = self.manager.tim_kiem_nang_cao(loai="Casual")
+        casual_results = self.manager.tim_kiem(loai="Casual")
         self.assertEqual(len(casual_results), 1)
         self.assertEqual(casual_results[0].ma_khach_hang, "C001")
 
-    def test_tim_kiem_nang_cao_theo_ten(self):
+    def test_tim_kiem_theo_ten(self):
         """
         Test case 14: Kiểm tra tìm kiếm nâng cao theo tên
         """
@@ -232,12 +232,12 @@ class TestCustomer(unittest.TestCase):
         )
         
         # Tìm kiếm theo tên chứa "Nguyễn"
-        results = self.manager.tim_kiem_nang_cao(ten_chua="Nguyễn")
+        results = self.manager.tim_kiem(ten_chua="Nguyễn")
         self.assertEqual(len(results), 2)
         self.assertIn("L001", [kh.ma_khach_hang for kh in results])
         self.assertIn("L002", [kh.ma_khach_hang for kh in results])
 
-    def test_tim_kiem_nang_cao_theo_sdt(self):
+    def test_tim_kiem_theo_sdt(self):
         """
         Test case 15: Kiểm tra tìm kiếm nâng cao theo số điện thoại
         """
@@ -246,11 +246,11 @@ class TestCustomer(unittest.TestCase):
         self.manager.them_khach_hang(self.casual_customer)
         
         # Tìm kiếm theo số điện thoại chứa "0912"
-        results = self.manager.tim_kiem_nang_cao(sdt_chua="0912")
+        results = self.manager.tim_kiem(sdt_chua="0912")
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].ma_khach_hang, "L001")
 
-    def test_tim_kiem_nang_cao_theo_email(self):
+    def test_tim_kiem_theo_email(self):
         """
         Test case 16: Kiểm tra tìm kiếm nâng cao theo email
         """
@@ -259,15 +259,15 @@ class TestCustomer(unittest.TestCase):
         self.manager.them_khach_hang(self.casual_customer)
         
         # Tìm kiếm theo email chứa "example.com"
-        results = self.manager.tim_kiem_nang_cao(email_chua="example.com")
+        results = self.manager.tim_kiem(email_chua="example.com")
         self.assertEqual(len(results), 2)
         
         # Tìm kiếm theo email chứa "a@"
-        results = self.manager.tim_kiem_nang_cao(email_chua="a@")
+        results = self.manager.tim_kiem(email_chua="a@")
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].ma_khach_hang, "L001")
 
-    def test_tim_kiem_nang_cao_theo_tong_gia_tri(self):
+    def test_tim_kiem_theo_tong_gia_tri(self):
         """
         Test case 17: Kiểm tra tìm kiếm nâng cao theo tổng giá trị mua hàng
         """
@@ -278,16 +278,16 @@ class TestCustomer(unittest.TestCase):
         )
         
         # Tìm kiếm theo tổng giá trị tối thiểu 1 triệu
-        results = self.manager.tim_kiem_nang_cao(tong_gia_min=1000000)
+        results = self.manager.tim_kiem(tong_gia_min=1000000)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].ma_khach_hang, "C001")
         
         # Tìm kiếm theo tổng giá trị tối đa 1 triệu
-        results = self.manager.tim_kiem_nang_cao(tong_gia_max=1000000)
+        results = self.manager.tim_kiem(tong_gia_max=1000000)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].ma_khach_hang, "C002")
 
-    def test_tim_kiem_nang_cao_theo_so_lan_mua(self):
+    def test_tim_kiem_theo_so_lan_mua(self):
         """
         Test case 18: Kiểm tra tìm kiếm nâng cao theo số lần mua hàng
         """
@@ -298,11 +298,11 @@ class TestCustomer(unittest.TestCase):
         )
         
         # Tìm kiếm theo số lần mua tối thiểu 3
-        results = self.manager.tim_kiem_nang_cao(so_lan_mua_min=3)
+        results = self.manager.tim_kiem(so_lan_mua_min=3)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].ma_khach_hang, "C001")
 
-    def test_tim_kiem_nang_cao_ket_hop(self):
+    def test_tim_kiem_ket_hop(self):
         """
         Test case 19: Kiểm tra tìm kiếm nâng cao kết hợp nhiều điều kiện
         """
@@ -314,7 +314,7 @@ class TestCustomer(unittest.TestCase):
         )
         
         # Tìm kiếm kết hợp: loại Casual + tên có "Nguyễn"
-        results = self.manager.tim_kiem_nang_cao(loai="Casual", ten_chua="Nguyễn")
+        results = self.manager.tim_kiem(loai="Casual", ten_chua="Nguyễn")
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].ma_khach_hang, "C002")
 
@@ -431,36 +431,121 @@ class TestCustomer(unittest.TestCase):
         self.assertEqual(casual.so_lan_mua_hang, 5)
         self.assertEqual(casual.tong_gia_tri_mua_hang, 1500000)
 
-    def test_luu_va_doc_file(self):
-        """
-        Test case 26: Kiểm tra lưu và đọc file CSV
-        """
-        # Thêm khách hàng
-        self.manager.them_khach_hang(self.loyal_customer)
-        self.manager.them_khach_hang(self.casual_customer)
+    def create_csv_file(self, filename, customers):
+        """Tạo file CSV với danh sách khách hàng"""
+        with open(filename, 'w', newline='', encoding='utf-8') as f:
+            fieldnames = ['Loai', 'MaKH', 'TenKH', 'SDT', 'Email', 'SoLanMua', 'TongGiaTri', 'DiemTichLuy']
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            for kh in customers:
+                writer.writerow(kh.to_dict())
+    
+    def test_workflow_add_and_save(self):
+        """Test quy trình thêm khách hàng và lưu file"""
+        # Khởi tạo đối tượng ManageCustomer với file mới
+        manager = ManageCustomer(self.test_file)
         
-        # Lưu vào file
-        self.manager.luu_file()
+        # Thêm khách hàng mới
+        new_customer = LoyalCustomer("KH004", "Lê Thị D", "0901234567", "d@example.com", 3, 2500000, 125)
+        manager.danh_sach_khach_hang.append(new_customer)
         
-        # Tạo manager mới để đọc file
-        new_manager = ManageCustomer(self.filename)
-        new_manager.doc_file()
+        # Lưu file
+        result = manager.ghi_file()
+        self.assertTrue(result)
         
-        # Kiểm tra đã đọc đúng số lượng
+        # Đọc lại file để kiểm tra
+        new_manager = ManageCustomer(self.test_file)
+        self.assertEqual(len(new_manager.danh_sach_khach_hang), 1)
+        self.assertEqual(new_manager.danh_sach_khach_hang[0].ma_kh, "KH004")
+    
+    def test_workflow_update_and_save(self):
+        """Test quy trình cập nhật khách hàng và lưu file"""
+        # Tạo file test
+        self.create_csv_file(self.test_file, self.sample_customers)
+        
+        # Khởi tạo đối tượng ManageCustomer
+        manager = ManageCustomer(self.test_file)
+        
+        # Cập nhật thông tin khách hàng
+        for kh in manager.danh_sach_khach_hang:
+            if kh.ma_kh == "KH001":
+                kh.so_lan_mua += 1
+                kh.tong_gia_tri += 1000000
+                if isinstance(kh, LoyalCustomer):
+                    kh.diem_tich_luy += 50
+        
+        # Lưu file
+        result = manager.ghi_file()
+        self.assertTrue(result)
+        
+        # Đọc lại file để kiểm tra
+        new_manager = ManageCustomer(self.test_file)
+        updated_customer = None
+        for kh in new_manager.danh_sach_khach_hang:
+            if kh.ma_kh == "KH001":
+                updated_customer = kh
+                break
+        
+        self.assertIsNotNone(updated_customer)
+        self.assertEqual(updated_customer.so_lan_mua, 6)
+        self.assertEqual(updated_customer.tong_gia_tri, 6000000)
+        self.assertEqual(updated_customer.diem_tich_luy, 300)
+    
+    def test_workflow_delete_and_save(self):
+        """Test quy trình xóa khách hàng và lưu file"""
+        # Tạo file test
+        self.create_csv_file(self.test_file, self.sample_customers)
+        
+        # Khởi tạo đối tượng ManageCustomer
+        manager = ManageCustomer(self.test_file)
+        
+        # Xóa khách hàng
+        manager.danh_sach_khach_hang = [kh for kh in manager.danh_sach_khach_hang if kh.ma_kh != "KH002"]
+        
+        # Lưu file
+        result = manager.ghi_file()
+        self.assertTrue(result)
+        
+        # Đọc lại file để kiểm tra
+        new_manager = ManageCustomer(self.test_file)
         self.assertEqual(len(new_manager.danh_sach_khach_hang), 2)
+        customer_ids = [kh.ma_kh for kh in new_manager.danh_sach_khach_hang]
+        self.assertIn("KH001", customer_ids)
+        self.assertIn("KH003", customer_ids)
+        self.assertNotIn("KH002", customer_ids)
+    
+    def test_workflow_concurrent_access(self):
+        """Test quy trình truy cập đồng thời file dữ liệu"""
+        # Tạo file test
+        self.create_csv_file(self.test_file, self.sample_customers)
         
-        # Kiểm tra thông tin khách hàng
-        loyal = new_manager.tim_kiem_nang_cao(ma_kh="L001")[0]
-        casual = new_manager.tim_kiem_nang_cao(ma_kh="C001")[0]
+        # Khởi tạo đối tượng ManageCustomer thứ nhất
+        manager1 = ManageCustomer(self.test_file)
         
-        self.assertEqual(loyal.ma_khach_hang, "L001")
-        self.assertEqual(loyal.ten_khach_hang, "Nguyễn Văn A")
-        self.assertEqual(loyal.diem_tich_luy, 500)
+        # Thay đổi dữ liệu trên đối tượng thứ nhất
+        for kh in manager1.danh_sach_khach_hang:
+            if kh.ma_kh == "KH001":
+                kh.ten_kh = "Nguyễn Văn A (đã cập nhật)"
         
-        self.assertEqual(casual.ma_khach_hang, "C001")
-        self.assertEqual(casual.ten_khach_hang, "Trần Thị B")
-        self.assertEqual(casual.so_lan_mua_hang, 5)
-        self.assertEqual(casual.tong_gia_tri_mua_hang, 1500000)
+        # Khởi tạo đối tượng ManageCustomer thứ hai
+        manager2 = ManageCustomer(self.test_file)
+        
+        # Thay đổi dữ liệu trên đối tượng thứ hai
+        for kh in manager2.danh_sach_khach_hang:
+            if kh.ma_kh == "KH001":
+                kh.ten_kh = "Nguyễn Văn A (quản lý 2)"
+        
+        # Đối tượng thứ hai lưu trước
+        result2 = manager2.ghi_file()
+        self.assertTrue(result2)
+        
+        # Đối tượng thứ nhất lưu sau
+        result1 = manager1.ghi_file()
+        self.assertTrue(result1)
+        
+        # Đọc lại file để kiểm tra - dữ liệu của đối tượng thứ nhất sẽ ghi đè
+        new_manager = ManageCustomer(self.test_file)
+        
 
     def test_cap_nhat_diem_tich_luy(self):
         """

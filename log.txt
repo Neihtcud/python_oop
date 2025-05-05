@@ -128,3 +128,84 @@
 [2025-05-06 01:25:26] Thêm khách hàng: L001 - C - Loyal
 [2025-05-06 01:25:26] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
 [2025-05-06 01:25:26] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:44:48] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:44:48] Cập nhật điểm tích lũy khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:44:48] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:44:48] Cập nhật mua hàng khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:44:48] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:44:48] Chuyển sang khách thân thiết khách hàng: C001 - Trần Thị B - Loyal
+[2025-05-06 01:44:48] Thêm khách hàng: C001 - A - Casual
+[2025-05-06 01:44:48] Thêm khách hàng: C002 - B - Casual
+[2025-05-06 01:44:48] Thêm khách hàng: C003 - C - Casual
+[2025-05-06 01:44:48] Thêm khách hàng: C004 - D - Casual
+[2025-05-06 01:44:48] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:44:48] Sửa khách hàng: L001 - Nguyễn Văn A Mới - Loyal
+[2025-05-06 01:44:48] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:44:48] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:44:48] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:44:48] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:44:48] Thêm khách hàng: L001 - A - Loyal
+[2025-05-06 01:44:48] Thêm khách hàng: L002 - B - Loyal
+[2025-05-06 01:44:48] Thêm khách hàng: L003 - C - Loyal
+[2025-05-06 01:44:48] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:44:48] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:44:48] Thêm khách hàng: C002 - Nguyễn Thị D - Casual
+[2025-05-06 01:44:48] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:44:48] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:44:48] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:44:48] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:44:48] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:44:48] Thêm khách hàng: C002 - Lê Thị D - Casual
+[2025-05-06 01:44:48] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:44:48] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:44:48] Thêm khách hàng: L002 - Nguyễn Văn C - Loyal
+[2025-05-06 01:44:48] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:44:48] Thêm khách hàng: C002 - Lê Thị D - Casual
+[2025-05-06 01:44:48] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:44:48] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:44:48] Thêm khách hàng: C001 - A - Casual
+[2025-05-06 01:44:48] Thêm khách hàng: C002 - B - Casual
+[2025-05-06 01:44:48] Thêm khách hàng: L001 - C - Loyal
+[2025-05-06 01:44:48] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:44:48] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:47:42] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:47:42] Cập nhật điểm tích lũy khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:47:42] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:47:42] Cập nhật mua hàng khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:47:42] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:47:42] Chuyển sang khách thân thiết khách hàng: C001 - Trần Thị B - Loyal
+[2025-05-06 01:47:42] Thêm khách hàng: C001 - A - Casual
+[2025-05-06 01:47:42] Thêm khách hàng: C002 - B - Casual
+[2025-05-06 01:47:42] Thêm khách hàng: C003 - C - Casual
+[2025-05-06 01:47:42] Thêm khách hàng: C004 - D - Casual
+[2025-05-06 01:47:42] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:47:42] Sửa khách hàng: L001 - Nguyễn Văn A Mới - Loyal
+[2025-05-06 01:47:42] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:47:42] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:47:42] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:47:42] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:47:42] Thêm khách hàng: L001 - A - Loyal
+[2025-05-06 01:47:42] Thêm khách hàng: L002 - B - Loyal
+[2025-05-06 01:47:42] Thêm khách hàng: L003 - C - Loyal
+[2025-05-06 01:47:42] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:47:42] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:47:42] Thêm khách hàng: C002 - Nguyễn Thị D - Casual
+[2025-05-06 01:47:42] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:47:42] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:47:42] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:47:42] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:47:42] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:47:42] Thêm khách hàng: C002 - Lê Thị D - Casual
+[2025-05-06 01:47:42] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:47:42] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:47:42] Thêm khách hàng: L002 - Nguyễn Văn C - Loyal
+[2025-05-06 01:47:42] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:47:42] Thêm khách hàng: C002 - Lê Thị D - Casual
+[2025-05-06 01:47:42] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:47:42] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 01:47:42] Thêm khách hàng: C001 - A - Casual
+[2025-05-06 01:47:42] Thêm khách hàng: C002 - B - Casual
+[2025-05-06 01:47:42] Thêm khách hàng: L001 - C - Loyal
+[2025-05-06 01:47:42] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
+[2025-05-06 01:47:42] Thêm khách hàng: C001 - Trần Thị B - Casual
+[2025-05-06 02:12:38] Thêm khách hàng: 001 - thiện - Loyal

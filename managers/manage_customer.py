@@ -118,7 +118,7 @@ class ManageCustomer:
         # Kiểm tra email có đúng định dạng không (kiểm tra đơn giản)
         return '@' in email and '.' in email.split('@')[-1]
 
-    def tim_kiem_nang_cao(self, loai=None, ten_chua=None, tong_gia_min=None, tong_gia_max=None, 
+    def tim_kiem(self, loai=None, ten_chua=None, tong_gia_min=None, tong_gia_max=None, 
                           so_lan_mua_min=None, ma_kh=None, sdt_chua=None, email_chua=None, 
                           diem_tich_luy_min=None):
         """Hàm tìm kiếm nâng cao với nhiều tiêu chí
@@ -153,13 +153,23 @@ class ManageCustomer:
             if email_chua and (not kh.email or email_chua.lower() not in kh.email.lower()):
                 continue
             
-            # Kiểm tra thông tin đặc biệt cho khách hàng vãng lai
-            if isinstance(kh, CasualCustomer):
-                if tong_gia_min is not None and kh.tong_gia_tri_mua_hang < tong_gia_min:
+            # Kiểm tra thông tin đặc biệt cho cả hai loại khách hàng
+            if tong_gia_min is not None:
+                if isinstance(kh, CasualCustomer) and kh.tong_gia_tri_mua_hang < tong_gia_min:
                     continue
-                if tong_gia_max is not None and kh.tong_gia_tri_mua_hang > tong_gia_max:
+                if isinstance(kh, LoyalCustomer) and kh.tong_gia_tri_mua_hang < tong_gia_min:
                     continue
-                if so_lan_mua_min is not None and kh.so_lan_mua_hang < so_lan_mua_min:
+                    
+            if tong_gia_max is not None:
+                if isinstance(kh, CasualCustomer) and kh.tong_gia_tri_mua_hang > tong_gia_max:
+                    continue
+                if isinstance(kh, LoyalCustomer) and kh.tong_gia_tri_mua_hang > tong_gia_max:
+                    continue
+                    
+            if so_lan_mua_min is not None:
+                if isinstance(kh, CasualCustomer) and kh.so_lan_mua_hang < so_lan_mua_min:
+                    continue
+                if isinstance(kh, LoyalCustomer) and kh.so_lan_mua_hang < so_lan_mua_min:
                     continue
             
             # Kiểm tra điểm tích lũy cho khách hàng thân thiết
@@ -202,6 +212,13 @@ class ManageCustomer:
             if kh.email and kh.email == khach_hang.email and khach_hang.email:
                print("\033[91mEmail đã tồn tại!\033[0m")
                return False
+
+        # Đảm bảo thiết lập giá trị mặc định cho số lần mua và tổng giá trị
+        if isinstance(khach_hang, LoyalCustomer):
+            if not hasattr(khach_hang, 'so_lan_mua_hang') or khach_hang.so_lan_mua_hang is None:
+                khach_hang.so_lan_mua_hang = 0
+            if not hasattr(khach_hang, 'tong_gia_tri_mua_hang') or khach_hang.tong_gia_tri_mua_hang is None:
+                khach_hang.tong_gia_tri_mua_hang = 0
 
         self.danh_sach_khach_hang.append(khach_hang)
         self.ghi_file()
@@ -293,7 +310,7 @@ class ManageCustomer:
             return False
 
     def cap_nhat_mua_hang(self, ma_khach_hang, so_lan_mua, gia_tri):
-        """Cập nhật thông tin mua hàng
+        """Cập nhật thông tin mua hàng cho cả khách hàng thân thiết và vãng lai
         
         Args:
             ma_khach_hang (str): Mã khách hàng
@@ -328,12 +345,26 @@ class ManageCustomer:
 
         # Xử lý khách hàng thân thiết
         if isinstance(kh, LoyalCustomer):
+            # Đảm bảo khách hàng thân thiết có thuộc tính theo dõi số lần mua và tổng giá trị
+            if not hasattr(kh, 'so_lan_mua_hang'):
+                kh.so_lan_mua_hang = 0
+            if not hasattr(kh, 'tong_gia_tri_mua_hang'):
+                kh.tong_gia_tri_mua_hang = 0
+                
+            # Cập nhật số lần mua và tổng giá trị
+            kh.so_lan_mua_hang += so_lan_mua
+            kh.tong_gia_tri_mua_hang += gia_tri
+            
             # Quy đổi điểm tích lũy: 10.000 VND = 1 điểm
             diem_moi = int(gia_tri // 10000)
             kh.diem_tich_luy += diem_moi
-            print(f"\033[94m✨ Cập nhật thành công: +{diem_moi} điểm tích lũy\033[0m")
-            print(f"\033[94m💰 Tổng điểm hiện tại: {kh.diem_tich_luy} điểm\033[0m")
-            ghi_log('Cập nhật điểm tích lũy', kh)
+            
+            print(f"\033[94m✨ Cập nhật thành công:\033[0m")
+            print(f"\033[94m💰 +{diem_moi} điểm tích lũy (tổng: {kh.diem_tich_luy} điểm)\033[0m")
+            print(f"\033[94m📊 Số lần mua hàng: {kh.so_lan_mua_hang} lần\033[0m")
+            print(f"\033[94m💵 Tổng giá trị mua hàng: {kh.tong_gia_tri_mua_hang:,.0f} VND\033[0m")
+            
+            ghi_log('Cập nhật mua hàng và điểm tích lũy', kh)
             self.ghi_file()
             return True
 
@@ -352,6 +383,11 @@ class ManageCustomer:
            
            # Tạo khách hàng thân thiết mới với cùng thông tin cơ bản
            kh_moi = LoyalCustomer(kh.ma_khach_hang, kh.ten_khach_hang, kh.so_dien_thoai, kh.email, diem_tich_luy)
+           
+           # Thêm thông tin về số lần mua và tổng giá trị mua hàng
+           kh_moi.so_lan_mua_hang = kh.so_lan_mua_hang
+           kh_moi.tong_gia_tri_mua_hang = kh.tong_gia_tri_mua_hang
+           
            self.danh_sach_khach_hang.append(kh_moi)
            
            print(f"\033[94m✨ Khách hàng đã được nâng cấp thành khách hàng thân thiết!\033[0m")
@@ -370,6 +406,47 @@ class ManageCustomer:
         print("\033[92m✔ Cập nhật mua hàng thành công.\033[0m")
         return True
 
+    def cap_nhat_diem_tich_luy(self, ma_khach_hang, diem_moi):
+        """Cập nhật trực tiếp điểm tích lũy cho khách hàng thân thiết
+        
+        Args:
+            ma_khach_hang (str): Mã khách hàng
+            diem_moi (int): Điểm tích lũy mới
+            
+        Returns:
+            bool: True nếu cập nhật thành công, False nếu thất bại
+        """
+        # Kiểm tra mã khách hàng
+        if not self.la_ma_kh_hop_le(ma_khach_hang):
+            print("\033[91mMã khách hàng không hợp lệ!\033[0m")
+            return False
+            
+        kh = next((k for k in self.danh_sach_khach_hang if k.ma_khach_hang == ma_khach_hang), None)
+        
+        if kh is None:
+            print("\033[91mKhông tìm thấy khách hàng.\033[0m")
+            return False
+            
+        if not isinstance(kh, LoyalCustomer):
+            print("\033[91mKhông áp dụng cho khách vãng lai.\033[0m")
+            return False
+            
+        try:
+            diem_moi = int(diem_moi)
+            if diem_moi < 0:
+                print("\033[91mĐiểm tích lũy không thể là số âm.\033[0m")
+                return False
+                
+            kh.diem_tich_luy = diem_moi
+            self.ghi_file()
+            ghi_log('Cập nhật điểm tích lũy', kh)
+            print(f"\033[92m✔ Cập nhật điểm tích lũy thành công: {diem_moi} điểm\033[0m")
+            return True
+        except ValueError:
+            print("\033[91mĐiểm tích lũy phải là số nguyên.\033[0m")
+            return False
+
+    
     def cap_nhat_diem_tich_luy(self, ma_khach_hang, diem_moi):
         """Cập nhật trực tiếp điểm tích lũy cho khách hàng thân thiết
         

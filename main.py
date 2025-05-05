@@ -10,17 +10,17 @@ def main():
 
     while True:
         # Menu chính cải tiến với màu sắc và định dạng
-        print("\033[96m╔═════════════════════════════════════════════════╗\033[0m")
-        print("\033[96m║            HỆ THỐNG QUẢN LÝ KHÁCH HÀNG          ║\033[0m")
-        print("\033[96m╠═════════════════════════════════════════════════╣\033[0m")
-        print("\033[93m║ 1. Thêm mới / Sửa thông tin / Xóa khách hàng    ║\033[0m")
-        print("\033[93m║ 2. Tìm kiếm khách hàng                          ║\033[0m")
-        print("\033[93m║ 3. Hiển thị danh sách khách hàng                ║\033[0m")
-        print("\033[93m║ 4. Tính tổng doanh thu                          ║\033[0m")
-        print("\033[93m║ 5. Hiển thị top 3 khách hàng mua nhiều nhất     ║\033[0m")
-        print("\033[93m║ 6. Thống kê KH thân thiết để tặng quà Tết       ║\033[0m")
-        print("\033[91m║ 0. Thoát chương trình                           ║\033[0m")
-        print("\033[96m╚═════════════════════════════════════════════════╝\033[0m")
+        print("\033[96m╔══════════════════════════════════════════════════════════════════════════╗\033[0m")
+        print("\033[96m║                        HỆ THỐNG QUẢN LÝ KHÁCH HÀNG                       ║\033[0m")
+        print("\033[96m╠══════════════════════════════════════════════════════════════════════════╣\033[0m")
+        print("\033[93m║ 1. Thêm mới / Sửa thông tin / Xóa khách hàng/Cập nhật mua hàng cho khách ║\033[0m")
+        print("\033[93m║ 2. Tìm kiếm khách hàng                                                   ║\033[0m")
+        print("\033[93m║ 3. Hiển thị danh sách khách hàng                                         ║\033[0m")
+        print("\033[93m║ 4. Tính tổng doanh thu                                                   ║\033[0m")
+        print("\033[93m║ 5. Hiển thị top 3 khách hàng mua nhiều nhất                              ║\033[0m")
+        print("\033[93m║ 6. Thống kê KH thân thiết để tặng quà Tết                                ║\033[0m")
+        print("\033[91m║ 0. Thoát chương trình                                                    ║\033[0m")
+        print("\033[96m╚══════════════════════════════════════════════════════════════════════════╝\033[0m")
         choice = input("\033[95m>> Chọn chức năng (0-6): \033[0m")
 
         if choice == '1':
@@ -163,7 +163,7 @@ def sua_thong_tin_khach_hang(ql):
         return
         
     # Sử dụng tim_kiem_nang_cao thay vì tim_kiem
-    kh = ql.tim_kiem_nang_cao(ma_kh=ma)
+    kh = ql.tim_kiem(ma_kh=ma)
     if not kh:
         print("\033[91mKhông tìm thấy khách hàng.\033[0m")
         return
@@ -290,16 +290,16 @@ def tim_kiem_khach_hang(ql):
             return
             
         loading()
-        ket_qua = ql.tim_kiem_nang_cao(ma_kh=ma_kh)
+        ket_qua = ql.tim_kiem(ma_kh=ma_kh)
         
     elif option == '2':
         ten = input("Nhập tên khách hàng (hoặc một phần tên): ")
         if not ten:
             print("\033[91mTên tìm kiếm không được để trống!\033[0m")
             return
-            
+           
         loading()
-        ket_qua = ql.tim_kiem_nang_cao(ten_chua=ten)
+        ket_qua = ql.tim_kiem(ten_chua=ten)
         
     elif option == '3':
         # Tìm kiếm nâng cao với nhiều điều kiện
@@ -331,7 +331,7 @@ def tim_kiem_khach_hang(ql):
         so_lan_mua_min = nhap_so_nguyen("Số lần mua tối thiểu (bỏ trống nếu không): ", None)
         
         loading()
-        ket_qua = ql.tim_kiem_nang_cao(
+        ket_qua = ql.tim_kiem(
             loai=loai,
             ten_chua=ten_chua,
             email_chua=email_chua,
@@ -384,10 +384,10 @@ def hien_thi_danh_sach(ql):
     print("5. Điểm tích lũy (chỉ áp dụng cho khách thân thiết)")
     
     sort_field_map = {
-        '1': 'ma_khach_hang',
-        '2': 'ten_khach_hang',
-        '3': 'so_dien_thoai',
-        '4': 'tong_gia_tri_mua_hang',
+        '1': 'ma_kh',
+        '2': 'ten_kh',
+        '3': 'sdt',
+        '4': 'tong_gia_tri',
         '5': 'diem_tich_luy'
     }
     
