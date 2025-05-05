@@ -51,7 +51,8 @@ class ManageCustomer:
         except Exception as e:
             print(f"\033[91mLỗi ghi file: {e}\033[0m")
 
-    def tim_kiem(self, loai=None, ten_chua=None, tong_gia_min=None, tong_gia_max=None, so_lan_mua_min=None, ma_kh=None, sdt_chua=None, email_chua=None):
+    def tim_kiem_nang_cao(self, loai=None, ten_chua=None, tong_gia_min=None, tong_gia_max=None, so_lan_mua_min=None, ma_kh=None, sdt_chua=None, email_chua=None):
+        """Hàm tìm kiếm nâng cao với nhiều tiêu chí"""
         ket_qua = []
         for kh in self.danh_sach_khach_hang:
             # Kiểm tra loại khách hàng
@@ -141,20 +142,29 @@ class ManageCustomer:
             print("\033[91mKhông tìm thấy khách hàng.\033[0m")
 
     def cap_nhat_mua_hang(self, ma_khach_hang, so_lan_mua, gia_tri):
+        """Cập nhật thông tin mua hàng"""
         kh = next((k for k in self.danh_sach_khach_hang if k.ma_khach_hang == ma_khach_hang), None)
 
         if kh is None:
            print("\033[91mKhông tìm thấy khách hàng.\033[0m")
            return
 
-        if not isinstance(kh, CasualCustomer):
-           print("\033[91mKhông áp dụng cho khách thân thiết.\033[0m")
-           return
-
         if so_lan_mua < 0 or gia_tri < 0:
            print("\033[91mGiá trị mua hàng không hợp lệ.\033[0m")
            return
 
+        # Xử lý khách hàng thân thiết
+        if isinstance(kh, LoyalCustomer):
+            # Quy đổi điểm tích lũy: 10.000 VND = 1 điểm
+            diem_moi = int(gia_tri // 10000)
+            kh.diem_tich_luy += diem_moi
+            print(f"\033[94m✨ Cập nhật thành công: +{diem_moi} điểm tích lũy\033[0m")
+            print(f"\033[94m💰 Tổng điểm hiện tại: {kh.diem_tich_luy} điểm\033[0m")
+            ghi_log('Cập nhật điểm tích lũy', kh)
+            self.ghi_file()
+            return
+
+        # Xử lý khách hàng vãng lai
         # Cập nhật số lần và giá trị
         kh.so_lan_mua_hang += so_lan_mua
         kh.tong_gia_tri_mua_hang += gia_tri
@@ -181,6 +191,69 @@ class ManageCustomer:
 
         self.ghi_file()
         print("\033[92m✔ Cập nhật mua hàng thành công.\033[0m")
+
+    def cap_nhat_diem_tich_luy(self, ma_khach_hang, diem_moi):
+        """Cập nhật trực tiếp điểm tích lũy cho khách hàng thân thiết"""
+        kh = next((k for k in self.danh_sach_khach_hang if k.ma_khach_hang == ma_khach_hang), None)
+        
+        if kh is None:
+            print("\033[91mKhông tìm thấy khách hàng.\033[0m")
+            return
+            
+        if not isinstance(kh, LoyalCustomer):
+            print("\033[91mKhông áp dụng cho khách vãng lai.\033[0m")
+            return
+            
+        try:
+            diem_moi = int(diem_moi)
+            if diem_moi < 0:
+                print("\033[91mĐiểm tích lũy không thể là số âm.\033[0m")
+                return
+                
+            kh.diem_tich_luy = diem_moi
+            self.ghi_file()
+            ghi_log('Cập nhật điểm tích lũy', kh)
+            print(f"\033[92m✔ Cập nhật điểm tích lũy thành công: {diem_moi} điểm\033[0m")
+        except ValueError:
+            print("\033[91mĐiểm tích lũy phải là số nguyên.\033[0m")
+
+    def them_diem_tich_luy(self, ma_khach_hang, diem_them):
+        """Thêm điểm tích lũy cho khách hàng thân thiết"""
+        kh = next((k for k in self.danh_sach_khach_hang if k.ma_khach_hang == ma_khach_hang), None)
+        
+        if kh is None:
+            print("\033[91mKhông tìm thấy khách hàng.\033[0m")
+            return
+            
+        if not isinstance(kh, LoyalCustomer):
+            print("\033[91mKhông áp dụng cho khách vãng lai.\033[0m")
+            return
+            
+        try:
+            diem_them = int(diem_them)
+            kh.diem_tich_luy += diem_them
+            
+            # Đảm bảo điểm tích lũy không âm
+            if kh.diem_tich_luy < 0:
+                kh.diem_tich_luy = 0
+                print("\033[93mCảnh báo: Điểm tích lũy đã giảm xuống 0.\033[0m")
+                
+            self.ghi_file()
+            ghi_log(f'{"Thêm" if diem_them > 0 else "Trừ"} điểm tích lũy', kh)
+            print(f"\033[92m✔ {diem_them:+d} điểm tích lũy. Tổng điểm hiện tại: {kh.diem_tich_luy}\033[0m")
+        except ValueError:
+            print("\033[91mĐiểm tích lũy phải là số nguyên.\033[0m")
+            
+    def giam_diem_tich_luy(self, ma_khach_hang, diem_giam):
+        """Giảm điểm tích lũy cho khách hàng thân thiết (wrapper cho them_diem_tich_luy)"""
+        try:
+            diem_giam = int(diem_giam)
+            if diem_giam < 0:
+                print("\033[91mVui lòng nhập số dương để giảm điểm.\033[0m")
+                return
+            self.them_diem_tich_luy(ma_khach_hang, -diem_giam)
+        except ValueError:
+            print("\033[91mĐiểm giảm phải là số nguyên.\033[0m")
 
     def hien_thi_danh_sach(self, key_sort=None, reverse=False, loai=None):
         """Hiển thị danh sách khách hàng với tùy chọn lọc theo loại"""
