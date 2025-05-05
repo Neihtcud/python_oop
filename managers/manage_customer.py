@@ -51,7 +51,7 @@ class ManageCustomer:
         except Exception as e:
             print(f"\033[91mLỗi ghi file: {e}\033[0m")
 
-    def tim_kiem_nang_cao(self, loai=None, ten_chua=None, tong_gia_min=None, tong_gia_max=None, so_lan_mua_min=None, ma_kh=None, sdt_chua=None, email_chua=None):
+    def tim_kiem(self, loai=None, ten_chua=None, tong_gia_min=None, tong_gia_max=None, so_lan_mua_min=None, ma_kh=None, sdt_chua=None, email_chua=None):
         ket_qua = []
         for kh in self.danh_sach_khach_hang:
             # Kiểm tra loại khách hàng
