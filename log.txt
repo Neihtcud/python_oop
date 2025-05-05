@@ -1,2 +1,3 @@
 [2025-05-05 02:41:07] Thêm khách hàng: 001 - thiện - Loyal
 [2025-05-05 03:00:02] Sửa khách hàng: 001 - thiện - Loyal
+[2025-05-05 19:14:10] Cập nhật điểm tích lũy khách hàng: 001 - thiện - Loyal

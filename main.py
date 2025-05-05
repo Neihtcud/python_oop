@@ -64,7 +64,7 @@ def sub_menu_quan_ly():
         print("\033[93m║ 1. Thêm khách hàng mới                          ║\033[0m")
         print("\033[93m║ 2. Sửa thông tin khách hàng                     ║\033[0m")
         print("\033[93m║ 3. Xóa khách hàng                               ║\033[0m")
-        print("\033[93m║ 4. Cập nhật mua hàng cho khách vãng lai         ║\033[0m")
+        print("\033[93m║ 4. Cập nhật mua hàng cho khách                  ║\033[0m")
         print("\033[91m║ 0. Quay lại menu chính                          ║\033[0m")
         print("\033[96m╚═════════════════════════════════════════════════╝\033[0m")
         choice = input("\033[95m>> Chọn chức năng (0-4): \033[0m")
@@ -173,7 +173,7 @@ def xoa_khach_hang(ql):
     ql.xoa_khach_hang(ma)
 
 def cap_nhat_mua_hang(ql):
-    """Chức năng cập nhật mua hàng cho khách hàng vãng lai"""
+    """Chức năng cập nhật mua hàng cho khách hàng"""
     print("\n=== CẬP NHẬT MUA HÀNG ===")
     ma = input("Nhập mã KH: ")
     # Sử dụng tim_kiem_nang_cao thay vì tim_kiem
@@ -183,23 +183,34 @@ def cap_nhat_mua_hang(ql):
         return
     else:
         kh = kh[0]
-        # Kiểm tra loại khách hàng
-        if isinstance(kh, LoyalCustomer):
-            print("\033[91mKhách hàng thân thiết không cần cập nhật mua hàng.\033[0m")
-            return
         print(f"Khách hàng: {kh.ten_khach_hang} ({kh.ma_khach_hang})")
+        
+        # Hiển thị thông tin khách hàng theo loại
+        if isinstance(kh, LoyalCustomer):
+            print(f"Loại: Khách hàng thân thiết (Loyal)")
+            print(f"Điểm tích lũy hiện tại: {kh.diem_tich_luy}")
+        else:
+            print(f"Loại: Khách hàng vãng lai (Casual)")
+            print(f"Số lần mua hàng: {kh.so_lan_mua_hang}")
+            print(f"Tổng giá trị mua hàng: {kh.tong_gia_tri_mua_hang:,.0f} VND")
 
     try:
-        so_lan_raw = input("Số lần mua: ")
-        gia_tri_raw = input("Tổng giá trị đơn hàng: ")
-        so_lan = int(so_lan_raw)
-        gia_tri = float(gia_tri_raw)
+        # Đối với khách hàng thân thiết, số lần mua không được sử dụng
+        if isinstance(kh, LoyalCustomer):
+            so_lan = 0
+            gia_tri_raw = input("Tổng giá trị đơn hàng: ")
+            gia_tri = float(gia_tri_raw)
+            print(f"Quy đổi: {int(gia_tri // 10000)} điểm tích lũy (10.000 VND = 1 điểm)")
+        else:
+            so_lan_raw = input("Số lần mua: ")
+            gia_tri_raw = input("Tổng giá trị đơn hàng: ")
+            so_lan = int(so_lan_raw)
+            gia_tri = float(gia_tri_raw)
         
         loading()
         ql.cap_nhat_mua_hang(ma, so_lan, gia_tri)
     except ValueError:
         print("\033[91mSố lần mua hoặc giá trị đơn hàng không hợp lệ.\033[0m")
-
 def tim_kiem_khach_hang(ql):
     """Chức năng tìm kiếm khách hàng"""
     print("\n=== TÌM KIẾM KHÁCH HÀNG ===")
