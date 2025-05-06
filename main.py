@@ -1,4 +1,4 @@
-from managers.manage_customer import ManageCustomer
+from manage.manage_customer import ManageCustomer
 from models.customer import LoyalCustomer, CasualCustomer
 from utils.helpers import clear_screen, loading, nhap_sdt, nhap_ten, kiem_tra_email, nhap_email
 import re

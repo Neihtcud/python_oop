@@ -56,7 +56,7 @@ class ManageCustomer:
                     except Exception as e:
                         print(f"\033[91mLỗi đọc dòng dữ liệu: {e}\033[0m")
                         continue
-            print(f"\033[92mĐã đọc {len(self.danh_sach_khach_hang)} khách hàng từ file\033[0m")
+            print(f"\033[92mĐÃ ĐỌC {len(self.danh_sach_khach_hang)} KHÁCH HÀNG TỪ FILE\033[0m")
         except Exception as e:
             print(f"\033[91mLỗi đọc file: {e}\033[0m")
             # Tạo bản sao lưu của file lỗi và tạo file mới

@@ -9,7 +9,7 @@ import csv
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from models.customer import Customer, LoyalCustomer, CasualCustomer  
-from managers.manage_customer import ManageCustomer
+from manage.manage_customer import ManageCustomer
 from utils.helpers import kiem_tra_email
 
 class TestCustomer(unittest.TestCase):
