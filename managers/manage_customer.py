@@ -119,7 +119,7 @@ class ManageCustomer:
         return '@' in email and '.' in email.split('@')[-1]
 
     def tim_kiem(self, loai=None, ten_chua=None, tong_gia_min=None, tong_gia_max=None, 
-                          so_lan_mua_min=None, ma_kh=None, sdt_chua=None, email_chua=None, 
+                          so_lan_mua_min=None,ten_chinh_xac=None, ma_kh=None, sdt_chua=None, email_chua=None, 
                           diem_tich_luy_min=None):
         #Hàm tìm kiếm nâng cao với nhiều tiêu chí
        
