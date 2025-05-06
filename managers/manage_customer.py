@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from models.customer import LoyalCustomer, CasualCustomer
 from utils.logger import ghi_log
 from utils.helpers import read_customers_from_csv, write_customers_to_csv
-    # ... Các phương thức khác của lớp ...
+    
 
 class ManageCustomer:
     def __init__(self, filename='khachhang.csv'):
@@ -121,22 +121,9 @@ class ManageCustomer:
     def tim_kiem(self, loai=None, ten_chua=None, tong_gia_min=None, tong_gia_max=None, 
                           so_lan_mua_min=None, ma_kh=None, sdt_chua=None, email_chua=None, 
                           diem_tich_luy_min=None):
-        """Hàm tìm kiếm nâng cao với nhiều tiêu chí
+        #Hàm tìm kiếm nâng cao với nhiều tiêu chí
+       
         
-        Args:
-            loai (str): 'Loyal' hoặc 'Casual'
-            ten_chua (str): Chuỗi có trong tên khách hàng
-            tong_gia_min (float): Giá trị mua hàng tối thiểu
-            tong_gia_max (float): Giá trị mua hàng tối đa
-            so_lan_mua_min (int): Số lần mua hàng tối thiểu
-            ma_kh (str): Mã khách hàng cần tìm
-            sdt_chua (str): Chuỗi có trong số điện thoại
-            email_chua (str): Chuỗi có trong email
-            diem_tich_luy_min (int): Điểm tích lũy tối thiểu
-            
-        Returns:
-            list: Danh sách khách hàng phù hợp với điều kiện
-        """
         ket_qua = []
         for kh in self.danh_sach_khach_hang:
             # Kiểm tra loại khách hàng
@@ -144,6 +131,8 @@ class ManageCustomer:
                 continue
                 
             # Kiểm tra thông tin cơ bản
+            if ten_chinh_xac and ten_chinh_xac.lower() != kh.ten_khach_hang.lower():
+                continue
             if ten_chua and ten_chua.lower() not in kh.ten_khach_hang.lower():
                 continue
             if ma_kh and kh.ma_khach_hang != ma_kh:
@@ -180,14 +169,7 @@ class ManageCustomer:
         return ket_qua
 
     def them_khach_hang(self, khach_hang):
-        """Thêm khách hàng mới vào hệ thống
         
-        Args:
-            khach_hang: Đối tượng LoyalCustomer hoặc CasualCustomer
-            
-        Returns:
-            bool: True nếu thêm thành công, False nếu thất bại
-        """
         # Kiểm tra thông tin bắt buộc
         if not self.la_ma_kh_hop_le(khach_hang.ma_khach_hang):
             print("\033[91mMã khách hàng không hợp lệ!\033[0m")
@@ -227,17 +209,8 @@ class ManageCustomer:
         return True
 
     def sua_thong_tin(self, ma_khach_hang, ten_moi=None, email_moi=None, sdt_moi=None):
-        """Sửa thông tin khách hàng
         
-        Args:
-            ma_khach_hang (str): Mã khách hàng cần sửa
-            ten_moi (str, optional): Tên mới của khách hàng
-            email_moi (str, optional): Email mới của khách hàng
-            sdt_moi (str, optional): Số điện thoại mới của khách hàng
-            
-        Returns:
-            bool: True nếu sửa thành công, False nếu thất bại
-        """
+       
         # Kiểm tra mã khách hàng
         if not self.la_ma_kh_hop_le(ma_khach_hang):
             print("\033[91mMã khách hàng không hợp lệ!\033[0m")
@@ -280,14 +253,7 @@ class ManageCustomer:
             return False
 
     def xoa_khach_hang(self, ma_khach_hang):
-        """Xoá khách hàng khỏi hệ thống
-        
-        Args:
-            ma_khach_hang (str): Mã khách hàng cần xoá
-            
-        Returns:
-            bool: True nếu xoá thành công, False nếu thất bại
-        """
+
         # Kiểm tra mã khách hàng
         if not self.la_ma_kh_hop_le(ma_khach_hang):
             print("\033[91mMã khách hàng không hợp lệ!\033[0m")
@@ -310,16 +276,6 @@ class ManageCustomer:
             return False
 
     def cap_nhat_mua_hang(self, ma_khach_hang, so_lan_mua, gia_tri):
-        """Cập nhật thông tin mua hàng cho cả khách hàng thân thiết và vãng lai
-        
-        Args:
-            ma_khach_hang (str): Mã khách hàng
-            so_lan_mua (int): Số lần mua hàng cần cập nhật
-            gia_tri (float): Giá trị mua hàng cần cập nhật
-            
-        Returns:
-            bool: True nếu cập nhật thành công, False nếu thất bại
-        """
         # Kiểm tra mã khách hàng
         if not self.la_ma_kh_hop_le(ma_khach_hang):
             print("\033[91mMã khách hàng không hợp lệ!\033[0m")
@@ -407,15 +363,6 @@ class ManageCustomer:
         return True
 
     def cap_nhat_diem_tich_luy(self, ma_khach_hang, diem_moi):
-        """Cập nhật trực tiếp điểm tích lũy cho khách hàng thân thiết
-        
-        Args:
-            ma_khach_hang (str): Mã khách hàng
-            diem_moi (int): Điểm tích lũy mới
-            
-        Returns:
-            bool: True nếu cập nhật thành công, False nếu thất bại
-        """
         # Kiểm tra mã khách hàng
         if not self.la_ma_kh_hop_le(ma_khach_hang):
             print("\033[91mMã khách hàng không hợp lệ!\033[0m")
@@ -448,15 +395,7 @@ class ManageCustomer:
 
     
     def cap_nhat_diem_tich_luy(self, ma_khach_hang, diem_moi):
-        """Cập nhật trực tiếp điểm tích lũy cho khách hàng thân thiết
-        
-        Args:
-            ma_khach_hang (str): Mã khách hàng
-            diem_moi (int): Điểm tích lũy mới
-            
-        Returns:
-            bool: True nếu cập nhật thành công, False nếu thất bại
-        """
+       
         # Kiểm tra mã khách hàng
         if not self.la_ma_kh_hop_le(ma_khach_hang):
             print("\033[91mMã khách hàng không hợp lệ!\033[0m")
@@ -488,15 +427,7 @@ class ManageCustomer:
             return False
 
     def them_diem_tich_luy(self, ma_khach_hang, diem_them):
-        """Thêm điểm tích lũy cho khách hàng thân thiết
         
-        Args:
-            ma_khach_hang (str): Mã khách hàng
-            diem_them (int): Số điểm thêm vào
-            
-        Returns:
-            bool: True nếu thêm điểm thành công, False nếu thất bại
-        """
         # Kiểm tra mã khách hàng
         if not self.la_ma_kh_hop_le(ma_khach_hang):
             print("\033[91mMã khách hàng không hợp lệ!\033[0m")
@@ -541,13 +472,7 @@ class ManageCustomer:
 
     def hien_thi_danh_sach(self, key_sort=None, reverse=False, loai=None):
         
-        """Hiển thị danh sách khách hàng với tùy chọn lọc theo loại
-    
-        Args:
-            key_sort (str): Trường để sắp xếp
-            reverse (bool): True để sắp xếp giảm dần, False để sắp xếp tăng dần
-            loai (str): 'Loyal' cho khách hàng thân thiết, 'Casual' cho khách hàng vãng lai, None cho tất cả
-        """
+        
         ds_hien_thi = self.danh_sach_khach_hang.copy()
     
         # Lọc theo loại nếu được chỉ định
@@ -623,11 +548,7 @@ class ManageCustomer:
     
             print(f"\nTổng số: {len(ds_hien_thi)} khách hàng")
     def in_thong_tin(self, kh):
-        """Hiển thị thông tin của một khách hàng
-    
-        Args:
-           kh: Đối tượng khách hàng (LoyalCustomer hoặc CasualCustomer)
-        """
+        
         if isinstance(kh, CasualCustomer):
            print(f"{kh.ma_khach_hang:<10} | {kh.ten_khach_hang:<20} | {kh.so_dien_thoai:<12} | {kh.email:<25} | Vãng lai | SL: {kh.so_lan_mua_hang}, GT: {kh.tong_gia_tri_mua_hang:,.0f} VND")
         else:

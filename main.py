@@ -228,7 +228,7 @@ def cap_nhat_mua_hang(ql):
         return
         
     # Sử dụng tim_kiem_nang_cao thay vì tim_kiem
-    kh = ql.tim_kiem_nang_cao(ma_kh=ma)
+    kh = ql.tim_kiem(ma_kh=ma)
     if not kh:
         print("\033[91mKhông tìm thấy khách hàng.\033[0m")
         return
@@ -293,13 +293,13 @@ def tim_kiem_khach_hang(ql):
         ket_qua = ql.tim_kiem(ma_kh=ma_kh)
         
     elif option == '2':
-        ten = input("Nhập tên khách hàng (hoặc một phần tên): ")
+        ten = input("Nhập tên khách hàng (nhập chính xác): ")
         if not ten:
             print("\033[91mTên tìm kiếm không được để trống!\033[0m")
             return
            
         loading()
-        ket_qua = ql.tim_kiem(ten_chua=ten)
+        ket_qua = ql.tim_kiem(ten_chinh_xac=ten)
         
     elif option == '3':
         # Tìm kiếm nâng cao với nhiều điều kiện
