@@ -209,3 +209,41 @@
 [2025-05-06 01:47:42] Thêm khách hàng: L001 - Nguyễn Văn A - Loyal
 [2025-05-06 01:47:42] Thêm khách hàng: C001 - Trần Thị B - Casual
 [2025-05-06 02:12:38] Thêm khách hàng: 001 - thiện - Loyal
+[2025-05-07 02:08:43] Thêm khách hàng: KH001 - Nguyen Van A - Casual
+[2025-05-07 02:08:43] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:08:43] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:08:43] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:08:43] Xóa khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:08:43] Thêm khách hàng: KH001 - Nguyen Van A - Casual
+[2025-05-07 02:08:43] Chuyển sang khách thân thiết khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:08:43] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:08:43] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:08:43] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:08:43] Sửa khách hàng: KH001 - Nguyen Van B - Loyal
+[2025-05-07 02:08:43] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:08:43] Cập nhật mua hàng và điểm tích lũy khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:16:02] Thêm khách hàng: KH001 - Nguyen Van A - Casual
+[2025-05-07 02:16:02] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:16:02] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:16:02] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:16:02] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:16:02] Xóa khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:16:02] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:16:02] Thêm khách hàng: KH001 - Nguyen Van A - Casual
+[2025-05-07 02:16:02] Thêm khách hàng: KH002 - Nguyen Van B - Casual
+[2025-05-07 02:16:02] Thêm khách hàng: KH001 - Nguyen Van A - Casual
+[2025-05-07 02:16:02] Chuyển sang khách thân thiết khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:16:02] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:16:02] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:16:02] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:16:02] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:16:02] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:16:02] Thêm khách hàng: KH002 - Nguyen Van B - Casual
+[2025-05-07 02:16:02] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:16:02] Thêm khách hàng: KH002 - Nguyen Van B - Casual
+[2025-05-07 02:16:03] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:16:03] Thêm khách hàng: KH002 - Nguyen Van B - Loyal
+[2025-05-07 02:16:03] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:16:03] Sửa khách hàng: KH001 - Nguyen Van B - Loyal
+[2025-05-07 02:16:03] Thêm khách hàng: KH001 - Nguyen Van A - Loyal
+[2025-05-07 02:16:03] Cập nhật mua hàng và điểm tích lũy khách hàng: KH001 - Nguyen Van A - Loyal
