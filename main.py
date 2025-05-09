@@ -139,21 +139,17 @@ def them_khach_hang(ql):
         else:
             print("\033[91mLựa chọn không hợp lệ. Vui lòng chọn 1 hoặc 2.\033[0m")
 
-    # Tạo khách hàng tương ứng
+    # Tạo khách hàng tương ứng với giá trị mặc định cho số lần mua và tổng giá trị
     if loai == 'loyal':
-        
-        kh = LoyalCustomer(ma, ten, sdt, email, )
+        kh = LoyalCustomer(ma, ten, sdt, email)
     elif loai == 'casual':
-        so_lan_mua_hang = nhap_so_nguyen("Số lần mua ban đầu: ", 0)
-        tong_gia_tri_mua_hang = nhap_so_thuc("Tổng giá trị mua hàng ban đầu: ", 0.0)
-        kh = CasualCustomer(ma, ten, sdt, email, so_lan_mua_hang, tong_gia_tri_mua_hang)
+        kh = CasualCustomer(ma, ten, sdt, email, 0, 0.0)  # Khởi tạo với giá trị mặc định
     else:
         print("\033[91mLỗi: Loại khách hàng không xác định.\033[0m")
         return
 
     loading()
     ql.them_khach_hang(kh)
-
 def sua_thong_tin_khach_hang(ql):
     """Chức năng sửa thông tin khách hàng"""
     print("\n=== SỬA THÔNG TIN KHÁCH HÀNG ===")
@@ -240,20 +236,19 @@ def cap_nhat_mua_hang(ql):
     if isinstance(kh, LoyalCustomer):
         print(f"Loại: Khách hàng thân thiết (Loyal)")
         
-        # Chỉ cần nhập giá trị đơn hàng cho khách thân thiết
+        # Nhập cả số lần mua và giá trị đơn hàng cho khách thân thiết
+        so_lan = nhap_so_nguyen("Số lần mua: ")
         gia_tri = nhap_so_thuc("Tổng giá trị đơn hàng: ")
+        
+        # Quy đổi điểm tích lũy từ giá trị mua hàng
         diem_quy_doi = int(gia_tri // 10000)
-        
         print(f"Quy đổi: +{diem_quy_doi} điểm tích lũy (10.000 VND = 1 điểm)")
-        
-        # Số lần mua không có ý nghĩa với khách thân thiết
-        so_lan = 0
+        print(f"Điểm hiện tại: {kh.diem_tich_luy}, Sau cập nhật: {kh.diem_tich_luy + diem_quy_doi}")
     else:
         print(f"Loại: Khách hàng vãng lai (Casual)")
-
         
         # Khách vãng lai cần cả số lần và giá trị
-        so_lan = nhap_so_nguyen("Số lần mua : ")
+        so_lan = nhap_so_nguyen("Số lần mua: ")
         gia_tri = nhap_so_thuc("Tổng giá trị đơn hàng: ")
         
         # Hiển thị thông tin điều kiện nâng cấp
@@ -270,7 +265,6 @@ def cap_nhat_mua_hang(ql):
         
     loading()
     ql.cap_nhat_mua_hang(ma, so_lan, gia_tri)
-
 def tim_kiem_khach_hang(ql):
     """Chức năng tìm kiếm khách hàng"""
     print("\n=== TÌM KIẾM KHÁCH HÀNG ===")
