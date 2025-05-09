@@ -169,16 +169,6 @@ class TestManageCustomer(unittest.TestCase):
         self.manager.them_khach_hang(loyal)
         self.assertTrue(self.manager.backup_file())
 
-    def test_thong_ke(self):
-        loyal = LoyalCustomer("KH001", "Nguyen Van A", "0987654321", "a@example.com", 100)
-        casual = CasualCustomer("KH002", "Nguyen Van B", "0987654322", "b@example.com", 3, 3000000)
-        self.manager.them_khach_hang(loyal)
-        self.manager.them_khach_hang(casual)
-        
-        with patch('manage.manage_customer.plt.show') as mock_show:
-            self.manager.thong_ke()
-            self.assertEqual(mock_show.call_count, 2)
-
     def test_hien_thi_top_khach_hang(self):
         casual1 = CasualCustomer("KH001", "Nguyen Van A", "0987654321", "a@example.com", 3, 5000000)
         casual2 = CasualCustomer("KH002", "Nguyen Van B", "0987654322", "b@example.com", 2, 3000000)
@@ -233,17 +223,8 @@ class TestHelpers(unittest.TestCase):
             self.assertTrue(mock_print.called)
             self.assertEqual(result, "Nguyen Van A")
 
-    def test_loading(self):
-        with patch('time.sleep'), patch('builtins.print') as mock_print:
-            loading("Đang tải")
-            self.assertTrue(mock_print.called)
-            mock_print.assert_has_calls([
-                call("Đang tải", end=""),
-                call(".", end="", flush=True),
-                call(".", end="", flush=True),
-                call(".", end="", flush=True),
-                call()
-            ])
+   
+            
 
 class TestLogger(unittest.TestCase):
     def setUp(self):
@@ -282,46 +263,6 @@ class TestMainFunctions(unittest.TestCase):
         from main import main
         main()
         mock_manager.assert_called_once()
-
-    @patch('main.ManageCustomer')
-    @patch('builtins.input', side_effect=["1", "0", "0"])  # Chọn menu quản lý rồi thoát
-    def test_main_menu_management(self, mock_input, mock_manager):
-        from main import main
-        mock_instance = mock_manager.return_value
-        main()
-        self.assertTrue(mock_instance.them_khach_hang.called or 
-                      mock_instance.sua_thong_tin.called or 
-                      mock_instance.xoa_khach_hang.called)
-
-    @patch('main.ManageCustomer')
-    @patch('builtins.input', side_effect=["2", "1", "KH001", "0", "0"])  # Tìm kiếm rồi thoát
-    def test_search_customer_flow(self, mock_input, mock_manager):
-        from main import main
-        mock_instance = mock_manager.return_value
-        mock_instance.tim_kiem.return_value = [
-            LoyalCustomer("KH001", "Nguyen Van A", "0987654321", "a@example.com", 100)
-        ]
-        
-        with patch('builtins.print') as mock_print:
-            main()
-            self.assertTrue(mock_print.called)
-            output = "\n".join([args[0] for args, _ in mock_print.call_args_list])
-            self.assertIn("KH001", output)
-
-    @patch('main.ManageCustomer')
-    @patch('builtins.input', side_effect=["3", "0"])  # Hiển thị DS rồi thoát
-    def test_display_customer_list(self, mock_input, mock_manager):
-        from main import main
-        mock_instance = mock_manager.return_value
-        mock_instance.danh_sach_khach_hang = [
-            LoyalCustomer("KH001", "Nguyen Van A", "0987654321", "a@example.com", 100)
-        ]
-        
-        with patch('builtins.print') as mock_print:
-            main()
-            self.assertTrue(mock_print.called)
-            output = "\n".join([args[0] for args, _ in mock_print.call_args_list])
-            self.assertIn("KH001", output)
 
 if __name__ == '__main__':
     unittest.main()

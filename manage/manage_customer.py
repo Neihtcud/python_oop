@@ -317,7 +317,6 @@ class ManageCustomer:
             
             print(f"\033[94m✨ Cập nhật thành công:\033[0m")
             print(f"\033[94m💰 +{diem_moi} điểm tích lũy (tổng: {kh.diem_tich_luy} điểm)\033[0m")
-            print(f"\033[94m📊 Số lần mua hàng: {kh.so_lan_mua_hang} lần\033[0m")
             print(f"\033[94m💵 Tổng giá trị mua hàng: {kh.tong_gia_tri_mua_hang:,.0f} VND\033[0m")
             
             ghi_log('Cập nhật mua hàng và điểm tích lũy', kh)
@@ -360,40 +359,7 @@ class ManageCustomer:
 
         self.ghi_file()
         print("\033[92m✔ Cập nhật mua hàng thành công.\033[0m")
-        return True
-
-    def cap_nhat_diem_tich_luy(self, ma_khach_hang, diem_moi):
-        # Kiểm tra mã khách hàng
-        if not self.la_ma_kh_hop_le(ma_khach_hang):
-            print("\033[91mMã khách hàng không hợp lệ!\033[0m")
-            return False
-            
-        kh = next((k for k in self.danh_sach_khach_hang if k.ma_khach_hang == ma_khach_hang), None)
-        
-        if kh is None:
-            print("\033[91mKhông tìm thấy khách hàng.\033[0m")
-            return False
-            
-        if not isinstance(kh, LoyalCustomer):
-            print("\033[91mKhông áp dụng cho khách vãng lai.\033[0m")
-            return False
-            
-        try:
-            diem_moi = int(diem_moi)
-            if diem_moi < 0:
-                print("\033[91mĐiểm tích lũy không thể là số âm.\033[0m")
-                return False
-                
-            kh.diem_tich_luy = diem_moi
-            self.ghi_file()
-            ghi_log('Cập nhật điểm tích lũy', kh)
-            print(f"\033[92m✔ Cập nhật điểm tích lũy thành công: {diem_moi} điểm\033[0m")
-            return True
-        except ValueError:
-            print("\033[91mĐiểm tích lũy phải là số nguyên.\033[0m")
-            return False
-
-    
+        return True 
     def cap_nhat_diem_tich_luy(self, ma_khach_hang, diem_moi):
        
         # Kiểm tra mã khách hàng
@@ -425,50 +391,6 @@ class ManageCustomer:
         except ValueError:
             print("\033[91mĐiểm tích lũy phải là số nguyên.\033[0m")
             return False
-
-    def them_diem_tich_luy(self, ma_khach_hang, diem_them):
-        
-        # Kiểm tra mã khách hàng
-        if not self.la_ma_kh_hop_le(ma_khach_hang):
-            print("\033[91mMã khách hàng không hợp lệ!\033[0m")
-            return False
-            
-        kh = next((k for k in self.danh_sach_khach_hang if k.ma_khach_hang == ma_khach_hang), None)
-        
-        if kh is None:
-            print("\033[91mKhông tìm thấy khách hàng.\033[0m")
-            return False
-            
-        if not isinstance(kh, LoyalCustomer):
-            print("\033[91mKhông áp dụng cho khách vãng lai.\033[0m")
-            return False
-            
-        try:
-            
-            diem_them = int(diem_them)
-            kh.diem_tich_luy += diem_them
-            
-            # Đảm bảo điểm tích lũy không âm
-            if kh.diem_tich_luy < 0:
-                kh.diem_tich_luy = 0
-                print("\033[93mCảnh báo: Điểm tích lũy đã giảm xuống 0.\033[0m")
-                
-            self.ghi_file()
-            ghi_log(f'{"Thêm" if diem_them > 0 else "Trừ"} điểm tích lũy', kh)
-            print(f"\033[92m✔ {diem_them:+d} điểm tích lũy. Tổng điểm hiện tại: {kh.diem_tich_luy}\033[0m")
-        except ValueError:
-            print("\033[91mĐiểm tích lũy phải là số nguyên.\033[0m")
-            
-    def giam_diem_tich_luy(self, ma_khach_hang, diem_giam):
-        """Giảm điểm tích lũy cho khách hàng thân thiết (wrapper cho them_diem_tich_luy)"""
-        try:
-            diem_giam = int(diem_giam)
-            if diem_giam < 0:
-                print("\033[91mVui lòng nhập số dương để giảm điểm.\033[0m")
-                return
-            self.them_diem_tich_luy(ma_khach_hang, -diem_giam)
-        except ValueError:
-            print("\033[91mĐiểm giảm phải là số nguyên.\033[0m")
 
     def hien_thi_danh_sach(self, key_sort=None, reverse=False, loai=None):
         
@@ -520,7 +442,7 @@ class ManageCustomer:
                print("-" * len(header))
         
                for kh in ds_hien_thi:
-                  print(f"{kh.ma_khach_hang:<10} | {kh.ten_khach_hang:<20} | {kh.so_dien_thoai:<12} | {kh.email:<25} | {kh.diem_tich_luy:<15}")
+                  print(f"{kh.ma_khach_hang:<10} | {kh.ten_khach_hang:<20} | {kh.so_dien_thoai:<12} | {kh.email:<25} | {kh.diem_tich_luy:<15}| {kh.tong_gia_tri_mua_hang:15,.0f}")
     
             elif loai == 'Casual':
                header = f"{'Mã KH':<10} | {'Tên KH':<20} | {'SĐT':<12} | {'Email':<25} | {'Số lần mua':<12} | {'Tổng giá trị':<15}"
@@ -538,7 +460,7 @@ class ManageCustomer:
         
                for kh in ds_hien_thi:
                     if isinstance(kh, LoyalCustomer):
-                      chi_tiet = f"Điểm TL: {kh.diem_tich_luy}"
+                      chi_tiet = f"SL: {kh.tong_gia_tri_mua_hang:}, Điểm TL: {kh.diem_tich_luy}"
                       loai_kh = "Thân thiết"
                     else:
                       chi_tiet = f"SL: {kh.so_lan_mua_hang}, GT: {kh.tong_gia_tri_mua_hang:,.0f}"
@@ -584,33 +506,6 @@ class ManageCustomer:
             writer.writerow(['Casual', casual, doanh_thu, f"{tb_casual:.0f} VND"])
             writer.writerow(['Tổng', loyal + casual, doanh_thu, '-'])
         print("✅ Đã lưu thống kê vào file: thongke.csv")
-
-        # Vẽ biểu đồ phân bố khách hàng
-        labels = ['Khách thân thiết', 'Khách vãng lai']
-        values = [loyal, casual]
-        plt.figure(figsize=(10, 6))
-        plt.bar(labels, values, color=['green', 'blue'])
-        plt.title('Thống kê số lượng khách hàng')
-        plt.xlabel('Loại khách hàng')
-        plt.ylabel('Số lượng')
-        plt.savefig('thongke_soluong.png')
-        
-        # Vẽ biểu đồ doanh thu nếu có khách hàng vãng lai
-        if casual > 0:
-            # Tính doanh thu trung bình theo từng khách hàng vãng lai
-            ten_khach_hang = [kh.ten_khach_hang for kh in casual_customers]
-            doanh_thu_values = [kh.tong_gia_tri_mua_hang for kh in casual_customers]
-            
-            plt.figure(figsize=(12, 6))
-            plt.bar(ten_khach_hang, doanh_thu_values, color='orange')
-            plt.title('Doanh thu theo khách hàng vãng lai')
-            plt.xlabel('Khách hàng')
-            plt.ylabel('Doanh thu (VND)')
-            plt.xticks(rotation=45)
-            plt.tight_layout()
-            plt.savefig('thongke_doanhthu.png')
-        
-        plt.show()
 
     def hien_thi_top_khach_hang(self, n=3):
         """Hiển thị n khách hàng có giá trị mua hàng cao nhất"""

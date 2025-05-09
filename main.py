@@ -141,12 +141,12 @@ def them_khach_hang(ql):
 
     # Tạo khách hàng tương ứng
     if loai == 'loyal':
-        diem = nhap_so_nguyen("Điểm tích lũy: ")
-        kh = LoyalCustomer(ma, ten, sdt, email, diem)
+        
+        kh = LoyalCustomer(ma, ten, sdt, email, )
     elif loai == 'casual':
-        so_lan = nhap_so_nguyen("Số lần mua hàng: ")
-        tong_gia_tri = nhap_so_thuc("Tổng giá trị mua hàng: ")
-        kh = CasualCustomer(ma, ten, sdt, email, so_lan, tong_gia_tri)
+        so_lan_mua_hang = nhap_so_nguyen("Số lần mua ban đầu: ", 0)
+        tong_gia_tri_mua_hang = nhap_so_thuc("Tổng giá trị mua hàng ban đầu: ", 0.0)
+        kh = CasualCustomer(ma, ten, sdt, email, so_lan_mua_hang, tong_gia_tri_mua_hang)
     else:
         print("\033[91mLỗi: Loại khách hàng không xác định.\033[0m")
         return
@@ -207,7 +207,7 @@ def xoa_khach_hang(ql):
         return
         
     # Kiểm tra xem khách hàng có tồn tại không trước khi xóa
-    kh = ql.tim_kiem_nang_cao(ma_kh=ma)
+    kh = ql.tim_kiem(ma_kh=ma)
     if not kh:
         print("\033[91mKhông tìm thấy khách hàng với mã này.\033[0m")
         return
@@ -239,7 +239,6 @@ def cap_nhat_mua_hang(ql):
     # Hiển thị thông tin khách hàng theo loại
     if isinstance(kh, LoyalCustomer):
         print(f"Loại: Khách hàng thân thiết (Loyal)")
-        print(f"Điểm tích lũy hiện tại: {kh.diem_tich_luy}")
         
         # Chỉ cần nhập giá trị đơn hàng cho khách thân thiết
         gia_tri = nhap_so_thuc("Tổng giá trị đơn hàng: ")
@@ -251,16 +250,15 @@ def cap_nhat_mua_hang(ql):
         so_lan = 0
     else:
         print(f"Loại: Khách hàng vãng lai (Casual)")
-        print(f"Số lần mua hàng hiện tại: {kh.so_lan_mua_hang}")
-        print(f"Tổng giá trị mua hàng hiện tại: {kh.tong_gia_tri_mua_hang:,.0f} VND")
+
         
         # Khách vãng lai cần cả số lần và giá trị
-        so_lan = nhap_so_nguyen("Số lần mua thêm: ")
+        so_lan = nhap_so_nguyen("Số lần mua : ")
         gia_tri = nhap_so_thuc("Tổng giá trị đơn hàng: ")
         
         # Hiển thị thông tin điều kiện nâng cấp
         if kh.tong_gia_tri_mua_hang + gia_tri > 2000000:
-            print("\033[92m✨ Sau giao dịch này, khách hàng sẽ được nâng cấp thành khách hàng thân thiết!\033[0m")
+            print("\033[92m✨ Khách hàng sẽ được nâng cấp thành khách hàng thân thiết!\033[0m")
         else:
             con_lai = 2000000 - (kh.tong_gia_tri_mua_hang + gia_tri)
             print(f"\033[93mSau giao dịch này, khách hàng cần mua thêm {con_lai:,.0f} VND để trở thành khách hàng thân thiết.\033[0m")
