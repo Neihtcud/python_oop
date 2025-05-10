@@ -283,11 +283,11 @@ class ManageCustomer:
             return False
 
     def cap_nhat_mua_hang(self, ma_khach_hang, so_lan_mua, gia_tri):
-        # Kiểm tra mã khách hàng
+    # Kiểm tra mã khách hàng
         if not self.la_ma_kh_hop_le(ma_khach_hang):
             print("\033[91mMã khách hàng không hợp lệ!\033[0m")
             return False
-            
+    
         # Kiểm tra giá trị đầu vào
         try:
             so_lan_mua = int(so_lan_mua)
@@ -295,78 +295,43 @@ class ManageCustomer:
         except ValueError:
             print("\033[91mSố lần mua hoặc giá trị không hợp lệ!\033[0m")
             return False
-            
+    
         if so_lan_mua < 0 or gia_tri < 0:
             print("\033[91mGiá trị mua hàng không hợp lệ.\033[0m")
             return False
-
+    
         kh = next((k for k in self.danh_sach_khach_hang if k.ma_khach_hang == ma_khach_hang), None)
-
+    
         if kh is None:
-           print("\033[91mKhông tìm thấy khách hàng.\033[0m")
-           return False
-
+            print("\033[91mKhông tìm thấy khách hàng.\033[0m")
+            return False
+    
         # Xử lý khách hàng thân thiết
         if isinstance(kh, LoyalCustomer):
+            if gia_tri < 2000000:
+                print("\033[91mGiá trị mua hàng tối thiểu cho khách hàng thân thiết là 2.000.000 VND!\033[0m")
+                return False
             # Đảm bảo khách hàng thân thiết có thuộc tính theo dõi số lần mua và tổng giá trị
             if not hasattr(kh, 'so_lan_mua_hang'):
                 kh.so_lan_mua_hang = 0
             if not hasattr(kh, 'tong_gia_tri_mua_hang'):
                 kh.tong_gia_tri_mua_hang = 0
-                
+    
             # Cập nhật số lần mua và tổng giá trị
             kh.so_lan_mua_hang += so_lan_mua
             kh.tong_gia_tri_mua_hang += gia_tri
-            
+    
             # Quy đổi điểm tích lũy: 10.000 VND = 1 điểm
             diem_moi = int(gia_tri // 10000)
             kh.diem_tich_luy += diem_moi
-            
+    
             print(f"\033[94m✨ Cập nhật thành công:\033[0m")
             print(f"\033[94m💰 +{diem_moi} điểm tích lũy (tổng: {kh.diem_tich_luy} điểm)\033[0m")
             print(f"\033[94m💵 Tổng giá trị mua hàng: {kh.tong_gia_tri_mua_hang:,.0f} VND\033[0m")
-            
+    
             ghi_log('Cập nhật mua hàng và điểm tích lũy', kh)
             self.ghi_file()
             return True
-
-        # Xử lý khách hàng vãng lai
-        # Cập nhật số lần và giá trị
-        kh.so_lan_mua_hang += so_lan_mua
-        kh.tong_gia_tri_mua_hang += gia_tri
-
-        # Kiểm tra điều kiện nâng cấp: tổng giá trị > 2.000.000 VND và số lần mua ≥ 3
-        if kh.tong_gia_tri_mua_hang > 2000000 and kh.so_lan_mua_hang >= 3:
-           # Quy đổi điểm tích lũy theo tỷ lệ 10.000 VND = 1 điểm
-           diem_tich_luy = int(kh.tong_gia_tri_mua_hang // 10000)
-           
-           # Xóa khách hàng vãng lai
-           self.danh_sach_khach_hang.remove(kh)
-           
-           # Tạo khách hàng thân thiết mới với cùng thông tin cơ bản
-           kh_moi = LoyalCustomer(kh.ma_khach_hang, kh.ten_khach_hang, kh.so_dien_thoai, kh.email, diem_tich_luy)
-           
-           # Thêm thông tin về số lần mua và tổng giá trị mua hàng
-           kh_moi.so_lan_mua_hang = kh.so_lan_mua_hang
-           kh_moi.tong_gia_tri_mua_hang = kh.tong_gia_tri_mua_hang
-           
-           self.danh_sach_khach_hang.append(kh_moi)
-           
-           print(f"\033[94m✨ Khách hàng đã được nâng cấp thành khách hàng thân thiết!\033[0m")
-           print(f"\033[94m🎁 Điểm tích lũy khởi đầu: {diem_tich_luy} điểm\033[0m")
-           ghi_log('Chuyển sang khách thân thiết', kh_moi)
-        else:
-           # Chưa đủ điều kiện nâng cấp
-           print(f"\033[93mĐiều kiện nâng cấp: Tổng giá trị > 2.000.000 VND và số lần mua ≥ 3\033[0m")
-           if kh.tong_gia_tri_mua_hang <= 2000000:
-               print(f"\033[93mKhách hàng cần mua thêm {2000000 - kh.tong_gia_tri_mua_hang:,.0f} VND để đủ điều kiện.\033[0m")
-           if kh.so_lan_mua_hang < 3:
-               print(f"\033[93mKhách hàng cần mua thêm {3 - kh.so_lan_mua_hang} lần để đủ điều kiện.\033[0m")
-           ghi_log('Cập nhật mua hàng', kh)
-
-        self.ghi_file()
-        print("\033[92m✔ Cập nhật mua hàng thành công.\033[0m")
-        return True 
     def cap_nhat_diem_tich_luy(self, ma_khach_hang, diem_moi):
        
         # Kiểm tra mã khách hàng
@@ -516,29 +481,29 @@ class ManageCustomer:
 
     def hien_thi_top_khach_hang(self, n=3):
         """Hiển thị n khách hàng có giá trị mua hàng cao nhất"""
-        # Lọc các khách hàng vãng lai
-        casual_customers = [kh for kh in self.danh_sach_khach_hang if isinstance(kh, CasualCustomer)]
+        # Lọc tất cả khách hàng (thân thiết + vãng lai)
+        all_customers = self.danh_sach_khach_hang
         
-        if not casual_customers:
-            print("\033[93mKhông có khách hàng vãng lai nào để hiển thị.\033[0m")
+        if not all_customers:
+            print("\033[93mKhông có khách hàng để hiển thị.\033[0m")
             return []
-            
-        # Sắp xếp theo giá trị mua hàng giảm dần
-        casual_customers.sort(key=lambda kh: kh.tong_gia_tri_mua_hang, reverse=True)
-        
+    
+        # Sắp xếp theo tổng giá trị mua hàng giảm dần
+        all_customers.sort(key=lambda kh: kh.tong_gia_tri_mua_hang, reverse=True)
+    
         # Lấy n khách hàng đầu tiên
-        top_n = casual_customers[:n]
-        
+        top_n = all_customers[:n]
+    
         print(f"\n=== TOP {n} KHÁCH HÀNG MUA HÀNG NHIỀU NHẤT ===")
         if not top_n:
             print("\033[93mKhông có đủ khách hàng để hiển thị.\033[0m")
             return []
-            
+    
         print(f"{'Mã KH':<10} | {'Tên KH':<20} | {'Số lần':<8} | {'Tổng giá trị':<15}")
         print("-" * 60)
         for i, kh in enumerate(top_n, 1):
             print(f"{i}. {kh.ma_khach_hang:<8} | {kh.ten_khach_hang:<20} | {kh.so_lan_mua_hang:<8} | {kh.tong_gia_tri_mua_hang:<15,.0f}")
-        
+    
         return top_n
 
     def thong_ke_khach_hang_than_thiet(self):
