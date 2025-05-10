@@ -332,6 +332,63 @@ class ManageCustomer:
             ghi_log('Cập nhật mua hàng và điểm tích lũy', kh)
             self.ghi_file()
             return True
+            # Kiểm tra điều kiện nâng cấp: tổng giá trị > 2.000.000 VND và số lần mua ≥ 3
+
+        if kh.tong_gia_tri_mua_hang > 2000000 and kh.so_lan_mua_hang >= 3:
+        
+        # Quy đổi điểm tích lũy theo tỷ lệ 10.000 VND = 1 điểm
+        
+        diem_tich_luy = int(kh.tong_gia_tri_mua_hang // 10000)
+        
+        
+        # Xóa khách hàng vãng lai
+        
+        self.danh_sach_khach_hang.remove(kh)
+        
+        
+        # Tạo khách hàng thân thiết mới với cùng thông tin cơ bản
+        
+        kh_moi = LoyalCustomer(kh.ma_khach_hang, kh.ten_khach_hang, kh.so_dien_thoai, kh.email, diem_tich_luy)
+        
+        
+        # Thêm thông tin về số lần mua và tổng giá trị mua hàng
+        
+        kh_moi.so_lan_mua_hang = kh.so_lan_mua_hang
+        
+        kh_moi.tong_gia_tri_mua_hang = kh.tong_gia_tri_mua_hang
+        
+        
+        self.danh_sach_khach_hang.append(kh_moi)
+        
+        
+        print(f"\033[94m✨ Khách hàng đã được nâng cấp thành khách hàng thân thiết!\033[0m")
+        
+        print(f"\033[94m🎁 Điểm tích lũy khởi đầu: {diem_tich_luy} điểm\033[0m")
+        
+        ghi_log('Chuyển sang khách thân thiết', kh_moi)
+        
+        else:
+        
+        # Chưa đủ điều kiện nâng cấp
+        
+        print(f"\033[93mĐiều kiện nâng cấp: Tổng giá trị > 2.000.000 VND và số lần mua ≥ 3\033[0m")
+        
+        if kh.tong_gia_tri_mua_hang <= 2000000:
+        
+        print(f"\033[93mKhách hàng cần mua thêm {2000000 - kh.tong_gia_tri_mua_hang:,.0f} VND để đủ điều kiện.\033[0m")
+        
+        if kh.so_lan_mua_hang < 3:
+        
+        print(f"\033[93mKhách hàng cần mua thêm {3 - kh.so_lan_mua_hang} lần để đủ điều kiện.\033[0m")
+        
+        ghi_log('Cập nhật mua hàng', kh)
+        
+        
+        self.ghi_file()
+        
+        print("\033[92m✔ Cập nhật mua hàng thành công.\033[0m")
+        
+        return True
     def cap_nhat_diem_tich_luy(self, ma_khach_hang, diem_moi):
        
         # Kiểm tra mã khách hàng
