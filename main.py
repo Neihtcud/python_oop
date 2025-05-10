@@ -365,7 +365,7 @@ def hien_thi_danh_sach(ql):
     print("1. Mã khách hàng")
     print("2. Tên khách hàng")
     print("3. Số điện thoại")
-    print("4. Tổng giá trị mua hàng (chỉ áp dụng cho khách vãng lai)")
+    print("4. Tổng giá trị mua hàng ")
     print("5. Điểm tích lũy (chỉ áp dụng cho khách thân thiết)")
     
     sort_field_map = {
