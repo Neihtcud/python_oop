@@ -158,13 +158,12 @@ def sua_thong_tin_khach_hang(ql):
         print("\033[91mMã khách hàng không được để trống!\033[0m")
         return
         
-    # Sử dụng tim_kiem_nang_cao thay vì tim_kiem
     kh = ql.tim_kiem(ma_kh=ma)
     if not kh:
         print("\033[91mKhông tìm thấy khách hàng.\033[0m")
         return
     
-    kh = kh[0]  # Lấy khách hàng đầu tiên từ kết quả tìm kiếm
+    kh = kh[0] 
     print(f"\nThông tin hiện tại:")
     ql.in_thong_tin(kh)
     
@@ -188,11 +187,6 @@ def sua_thong_tin_khach_hang(ql):
         
     loading()
     ql.sua_thong_tin(ma, ten_moi, email_moi, sdt_moi)
-    
-    # Thêm tùy chọn cập nhật thông tin đặc thù của từng loại khách hàng
-    if isinstance(kh, LoyalCustomer) and input("Bạn có muốn cập nhật điểm tích lũy không? (y/n): ").strip().lower() == 'y':
-        diem_moi = nhap_so_nguyen(f"Điểm tích lũy mới (hiện tại: {kh.diem_tich_luy}): ")
-        ql.cap_nhat_diem_tich_luy(ma, diem_moi)
 
 def xoa_khach_hang(ql):
     """Chức năng xóa khách hàng"""
@@ -202,13 +196,13 @@ def xoa_khach_hang(ql):
         print("\033[91mMã khách hàng không được để trống!\033[0m")
         return
         
-    # Kiểm tra xem khách hàng có tồn tại không trước khi xóa
+    # Kiểm tra xem khách hàng có tồn tại không 
     kh = ql.tim_kiem(ma_kh=ma)
     if not kh:
         print("\033[91mKhông tìm thấy khách hàng với mã này.\033[0m")
         return
         
-    # Hiển thị thông tin khách hàng trước khi xóa để xác nhận
+    # Hiển thị thông tin khách hàng để xác nhận
     print("\nThông tin khách hàng sẽ bị xóa:")
     ql.in_thong_tin(kh[0])
     
@@ -222,14 +216,13 @@ def cap_nhat_mua_hang(ql):
     if not ma:
         print("\033[91mMã khách hàng không được để trống!\033[0m")
         return
-        
-    # Sử dụng tim_kiem_nang_cao thay vì tim_kiem
+       
     kh = ql.tim_kiem(ma_kh=ma)
     if not kh:
         print("\033[91mKhông tìm thấy khách hàng.\033[0m")
         return
     
-    kh = kh[0]  # Lấy khách hàng đầu tiên từ kết quả tìm kiếm
+    kh = kh[0]  
     print(f"\nKhách hàng: {kh.ten_khach_hang} ({kh.ma_khach_hang})")
     
     # Hiển thị thông tin khách hàng theo loại
