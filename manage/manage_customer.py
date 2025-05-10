@@ -139,6 +139,9 @@ class ManageCustomer:
                     continue
                 if isinstance(kh, LoyalCustomer) and kh.so_lan_mua_hang < so_lan_mua_min:
                     continue
+            if diem_tich_luy_min is not None:
+                if not isinstance(kh, LoyalCustomer) or kh.diem_tich_luy < diem_tich_luy_min:
+                   continue       
                 
             ket_qua.append(kh)
         return ket_qua
